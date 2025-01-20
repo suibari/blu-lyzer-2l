@@ -2,15 +2,20 @@
   import type { ResultAnalyze } from '$types/api';
   import { onMount } from 'svelte';
   import { page } from '$app/state';
+  import AnalyzeGrid from '$lib/components/CardGrid.svelte';
+  import GraphGrid from '$lib/components/GraphGrid.svelte';
+    import CardFriends from '$lib/components/CardFriends.svelte';
 
   let handle: string;
-  let resultAnalyze: ResultAnalyze | null = null;
+  let resultAnalyze: ResultAnalyze;
   let error: string | null = null;
+  let summary: Array<{ title: string; content: string | number }>
 
-  // ページパラメータからドメイン名を取得
+  // ------------------------
+  // fetch
+  // ------------------------
   $: handle = page.params.handle;
 
-  // サーバーからJSONを取得
   onMount(async () => {
     try {
       const res = await fetch(`/stats/${handle}`);
@@ -26,23 +31,26 @@
         error = `Error fetching data: ${err.message}`;
       }
     }
+
+    summary = [
+      { title: 'Last Action Time', content: resultAnalyze.lastActionTime },
+      { title: 'Average Interval', content: resultAnalyze.averageInterval },
+      { title: 'Average Text Length', content: resultAnalyze.averageTextLength }
+    ];
   });
 </script>
 
-<h1>Analysis for {handle}</h1>
+<h1 class="text-2xl">Analysis for {handle}</h1>
 
 {#if error}
   <p style="color: red;">{error}</p>
 {:else if resultAnalyze}
-  <h2>Result Analyze</h2>
-  <ul>
-    <li><strong>Last Action Time:</strong> {resultAnalyze.lastActionTime}</li>
-    <li><strong>Average Interval:</strong> {resultAnalyze.averageInterval}</li>
-    <li><strong>Average Text Length:</strong> {resultAnalyze.averageTextLength}</li>
-    <li><strong>Recent Friends:</strong> {resultAnalyze.recentFriends}</li>
-    <li><strong>Sentiment Heatmap:</strong> {resultAnalyze.sentimentHeatmap}</li>
-    <li><strong>Word Frequency Map:</strong> {resultAnalyze.wordFreqMap}</li>
-  </ul>
+  <div class="p-8 bg-gray-100 space-y-4">
+    <h2 class="text-2xl font-bold mb-6 text-gray-700">Result Analyze</h2>
+    <AnalyzeGrid cards={summary} />
+    <CardFriends recentFriends={resultAnalyze.recentFriends} />
+    <GraphGrid sentimentHeatmap={resultAnalyze.sentimentHeatmap} activeHistgram={resultAnalyze.activeHistgram} />
+  </div>
 {:else}
   <p>Loading...</p>
 {/if}
