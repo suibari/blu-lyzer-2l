@@ -9,7 +9,7 @@
   let handle: string;
   let resultAnalyze: ResultAnalyze;
   let error: string | null = null;
-  let summary: Array<{ title: string; content: string | number }>
+  let summary: Array<{ title: string; content: string | number | null }>
 
   // ------------------------
   // fetch
@@ -21,8 +21,7 @@
       const res = await fetch(`/stats/${handle}`);
       if (res.ok) {
         console.log(res)
-        const data = await res.json();
-        resultAnalyze = data.result_analyze;
+        resultAnalyze = await res.json();
       } else {
         error = `Error fetching data: ${res.statusText}`;
       }
@@ -33,9 +32,9 @@
     }
 
     summary = [
-      { title: 'Last Action Time', content: resultAnalyze.lastActionTime },
-      { title: 'Average Interval', content: resultAnalyze.averageInterval },
-      { title: 'Average Text Length', content: resultAnalyze.averageTextLength }
+      { title: 'Last Action Time', content: resultAnalyze.activity.all.lastAt },
+      { title: 'Average Interval', content: resultAnalyze.activity.all.averageInterval },
+      { title: 'Average Text Length', content: resultAnalyze.activity.post.averageLength }
     ];
   });
 </script>
@@ -48,8 +47,8 @@
   <div class="p-8 bg-gray-100 space-y-4">
     <h2 class="text-2xl font-bold mb-6 text-gray-700">Result Analyze</h2>
     <AnalyzeGrid cards={summary} />
-    <CardFriends recentFriends={resultAnalyze.recentFriends} />
-    <GraphGrid sentimentHeatmap={resultAnalyze.sentimentHeatmap} activeHistgram={resultAnalyze.activeHistgram} />
+    <CardFriends recentFriends={resultAnalyze.relationship} />
+    <GraphGrid sentimentHeatmap={resultAnalyze.activity.post.sentimentHeatmap} activeHistgram={resultAnalyze.activity.all.actionHeatmap} />
   </div>
 {:else}
   <p>Loading...</p>

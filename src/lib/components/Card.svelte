@@ -1,6 +1,6 @@
 <script lang="ts">
   export let title: string;
-  export let content: string | number | HTMLElement;
+  export let content: string | number | HTMLElement | null;
 </script>
 
 <div class="border rounded-lg p-4 bg-white shadow-md">
