@@ -40,6 +40,9 @@ export async function getNounFrequencies(posts: RecordExt[]): Promise<{
       sentimentHeatmap[Number(hour)] = count > 0 ? sum / count : 0;
     });
 
+    // count順に降順ソート
+    wordFreqMap.sort((a, b) => b.count - a.count);
+
   } catch (err) {
     console.warn('[WARN] Error in word analyze:', err);
   }
