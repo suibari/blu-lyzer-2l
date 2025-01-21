@@ -43,6 +43,7 @@ export async function analyzeRecords(records: RecordMap): Promise<ResultAnalyze>
       },
     },
     relationship: getRecentFriends(records.posts, records.likes),
+    updatedAt: new Date().toDateString(),
   }
 }
 

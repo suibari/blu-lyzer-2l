@@ -3,7 +3,8 @@ import { AtpAgent } from '@atproto/api';
 import { supabase } from '../supabase';
 
 // Bluesky セッション管理クラス
-export class SessionManager {
+export default class SessionManager {
+  private static instance: SessionManager;
   private agent: AtpAgent;
   private identifier: string;
   private password: string;
@@ -12,6 +13,13 @@ export class SessionManager {
     this.agent = new AtpAgent({ service: 'https://bsky.social' });
     this.identifier = BSKY_IDENTIFIER;
     this.password = BSKY_APP_PASSWORD;
+  }
+
+  static getInstance(): SessionManager {
+    if (!this.instance) {
+      this.instance = new SessionManager();
+    }
+    return this.instance;
   }
 
   async createOrRefreshSession(): Promise<void> {
@@ -33,7 +41,7 @@ export class SessionManager {
       try {
         await this.agent.app.bsky.feed.getTimeline();
       } catch (err: any) {
-        if (err.response?.data?.error === 'ExpiredToken') {
+        if (err.error === 'ExpiredToken') {
           console.info('[INFO] Session expired. Refreshing session.');
           await this.refreshSession();
         } else {
@@ -81,5 +89,3 @@ export class SessionManager {
     return this.agent;
   }
 }
-
-export default SessionManager;

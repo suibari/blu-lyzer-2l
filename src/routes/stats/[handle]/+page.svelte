@@ -4,7 +4,7 @@
   import { page } from '$app/state';
   import AnalyzeGrid from '$lib/components/CardGrid.svelte';
   import GraphGrid from '$lib/components/GraphGrid.svelte';
-    import CardFriends from '$lib/components/CardFriends.svelte';
+  import CardWide from '$lib/components/CardWide.svelte';
 
   let handle: string;
   let resultAnalyze: ResultAnalyze;
@@ -20,7 +20,6 @@
     try {
       const res = await fetch(`/stats/${handle}`);
       if (res.ok) {
-        console.log(res)
         resultAnalyze = await res.json();
       } else {
         error = `Error fetching data: ${res.statusText}`;
@@ -47,7 +46,10 @@
   <div class="p-8 bg-gray-100 space-y-4">
     <h2 class="text-2xl font-bold mb-6 text-gray-700">Result Analyze</h2>
     <AnalyzeGrid cards={summary} />
-    <CardFriends recentFriends={resultAnalyze.relationship} />
+    <CardWide title="Recent Friends" items={resultAnalyze.relationship.map(friend => ({label: friend.did, value: friend.score}))} />
+    {#if resultAnalyze.activity.post.wordFreqMap}
+      <CardWide title="Word Frequencies" items={resultAnalyze.activity.post.wordFreqMap.map(word => ({label: word.noun, value: word.count}))} />
+    {/if}
     <GraphGrid sentimentHeatmap={resultAnalyze.activity.post.sentimentHeatmap} activeHistgram={resultAnalyze.activity.all.actionHeatmap} />
   </div>
 {:else}
