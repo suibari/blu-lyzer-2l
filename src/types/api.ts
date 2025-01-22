@@ -23,6 +23,7 @@ export interface ResultAnalyze {
     };
   };
   relationship: RecentFriend[];
+  updatedAt: string;
 }
 
 export interface wordFreq {
@@ -35,6 +36,7 @@ export interface RecentFriend {
   did: string;
   handle?: string;
   displayName?: string;
+  avator?: string;
   score: number;
   replyCount?: number;
   likeCount?: number;

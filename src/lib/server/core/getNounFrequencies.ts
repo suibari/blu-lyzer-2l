@@ -1,4 +1,4 @@
-import { EXCLUDE_WORDS } from './config/excludeWords';
+import { EXCLUDE_WORDS, MIN_WORD_COUNT, MIN_WORD_LENGTH } from './config/excludeWords';
 import type { wordFreq } from '$types/api';
 import { fetchSentimentAnalysis } from './fetchAnalyzer';
 import type { RecordExt } from '$types/atproto';
@@ -21,7 +21,7 @@ export async function getNounFrequencies(posts: RecordExt[]): Promise<{
     const { nouns_counts, average_sentiments } = await fetchSentimentAnalysis(textsArray);
 
     nouns_counts.forEach(({ noun, count, sentiment_sum }) => {
-      if (!EXCLUDE_WORDS.includes(noun)) {
+      if (!EXCLUDE_WORDS.includes(noun) && noun.length >= MIN_WORD_LENGTH && count >= MIN_WORD_COUNT) {
         wordFreqMap.push({ noun, count, sentimentScoreSum: sentiment_sum });
       }
     });

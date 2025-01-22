@@ -1,7 +1,7 @@
 import { getLatestRecords } from '$lib/server/bluesky/getLatestRecords';
 import SessionManager from '$lib/server/bluesky/sessionManager';
 import { analyzeRecords } from '$lib/server/core/analyzeRecords';
-import { transformAppToDb, transformDbToApp } from '$lib/server/core/transformDbDataToAppStructure';
+import { transformAppToDb, transformDbToApp } from '$lib/server/core/transformType';
 import { supabase } from '$lib/server/supabase';
 import type { ResultAnalyze, ResultAnalyzeDB } from '$types/api';
 import type { RequestHandler } from '@sveltejs/kit';

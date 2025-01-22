@@ -7,13 +7,14 @@ export type RecordMap = {
   repost: RecordExt[];
 };
 
+const sessionManager = SessionManager.getInstance();
+
 /**
  * Get the latest posts, likes, and reposts for a given handle
  * @param handle The Bluesky handle of the user
  * @returns Promise<RecordMap> Containing posts, likes, and reposts
  */
 export async function getLatestRecords(handle: string): Promise<RecordMap> {
-  const sessionManager = SessionManager.getInstance();
   await sessionManager.createOrRefreshSession();
 
   const agent = sessionManager.getAgent();

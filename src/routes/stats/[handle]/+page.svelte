@@ -46,7 +46,15 @@
   <div class="p-8 bg-gray-100 space-y-4">
     <h2 class="text-2xl font-bold mb-6 text-gray-700">Result Analyze</h2>
     <AnalyzeGrid cards={summary} />
-    <CardWide title="Recent Friends" items={resultAnalyze.relationship.map(friend => ({label: friend.did, value: friend.score}))} />
+    <CardWide
+      title="Recent Friends"
+      items={resultAnalyze.relationship.map(friend => ({
+        label: friend.displayName || "",
+        value: friend.score,
+        img: friend.avator,
+        handle: friend.handle,
+      }))}
+    />
     {#if resultAnalyze.activity.post.wordFreqMap}
       <CardWide title="Word Frequencies" items={resultAnalyze.activity.post.wordFreqMap.map(word => ({label: word.noun, value: word.count}))} />
     {/if}

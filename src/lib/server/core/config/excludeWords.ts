@@ -17,3 +17,7 @@ export const EXCLUDE_WORDS = [
   "ちんぽ", "ちんちん", // R-18
   "なん", "あと", "うち", "たち", "とき", "感じ", "気持ち", "楽しみ", // 運用してみていらないもの
 ];
+
+export const MIN_WORD_LENGTH = 2; // 単語の最小長
+
+export const MIN_WORD_COUNT = 2; // 単語の最小出現数

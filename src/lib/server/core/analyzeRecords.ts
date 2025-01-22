@@ -2,6 +2,7 @@ import type { Record } from '@atproto/api/dist/client/types/com/atproto/repo/lis
 import { getNounFrequencies } from "./getNounFrequencies";
 import type { RecentFriend, ResultAnalyze } from "$types/api";
 import type { RecordExt } from '$types/atproto';
+import SessionManager from '../bluesky/sessionManager';
 
 const SCORE_REPLY = 10;
 const SCORE_LIKE = 1;
@@ -11,6 +12,8 @@ export type RecordMap = {
   likes: RecordExt[],
   repost: RecordExt[]
 }
+
+const sessionManager = SessionManager.getInstance();
 
 export async function analyzeRecords(records: RecordMap): Promise<ResultAnalyze> {
   const allRecords = collectAllRecords(records);
@@ -42,8 +45,8 @@ export async function analyzeRecords(records: RecordMap): Promise<ResultAnalyze>
         lastAt: getLastActionTime(records.repost),
       },
     },
-    relationship: getRecentFriends(records.posts, records.likes),
-    updatedAt: new Date().toDateString(),
+    relationship: await getRecentFriends(records.posts, records.likes),
+    updatedAt: new Date().toISOString(),
   }
 }
 
@@ -83,7 +86,7 @@ function getLastActionTime(records: RecordExt[]): string | null {
     (a, b) => new Date(b.value.createdAt).getTime() - new Date(a.value.createdAt).getTime()
   );
 
-  return new Date(records[0].value.createdAt).toLocaleDateString();
+  return new Date(records[0].value.createdAt).toISOString();
 }
 
 // Calculate average text length for posts
@@ -96,7 +99,7 @@ function calculateAverageTextLength(posts: RecordExt[]) {
 }
 
 // Get recent friends with reply and like score
-function getRecentFriends(posts: RecordExt[], likes: RecordExt[]) {
+async function getRecentFriends(posts: RecordExt[], likes: RecordExt[]) {
   let recentFriends: RecentFriend[] = [];
   let didReply = extractDidFromReplies(posts);
   let didLike = extractDidFromLikes(likes);
@@ -104,7 +107,25 @@ function getRecentFriends(posts: RecordExt[], likes: RecordExt[]) {
   recentFriends = aggregateRecentFriends(didReply, recentFriends, SCORE_REPLY);
   recentFriends = aggregateRecentFriends(didLike, recentFriends, SCORE_LIKE);
 
-  return sortRecentFriendsByScore(recentFriends);
+  // getProfilesが25までなのでslice
+  const recentFriendsSorted = sortRecentFriendsByScore(recentFriends);
+  const recentFriendsSliced = recentFriendsSorted.slice(0, 25);
+
+  // getProfilesし、recentFriendsに名前やアバターを追加
+  const actors = recentFriendsSliced.map(friend => friend.did);
+  await sessionManager.createOrRefreshSession();
+  const agent = sessionManager.getAgent();
+  const {data} = await agent.getProfiles({actors});
+  recentFriendsSliced.forEach(friend => {
+    const matchProf = data.profiles.find(profile => profile.did === friend.did);
+    if (matchProf) {
+      friend.handle = matchProf.handle;
+      friend.displayName = matchProf.displayName;
+      friend.avator = matchProf.avatar;
+    }
+  })
+
+  return recentFriendsSliced;
 }
 
 // Extract DID from post replies
