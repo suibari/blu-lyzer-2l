@@ -1,10 +1,10 @@
 import { PUBLIC_NODE_ENV } from '$env/static/public';
-import { getLatestRecords } from '$lib/server/bluesky/getLatestRecords';
 import SessionManager from '$lib/server/bluesky/sessionManager';
-import { analyzeRecords } from '$lib/server/core/analyzeRecords';
 import { transformAppToDb, transformDbToApp } from '$lib/server/core/transformType';
+import { getRecordsAndAnalyze, upsertRecords } from '$lib/server/inngest';
 import { supabase } from '$lib/server/supabase';
 import type { RequestHandler } from '@sveltejs/kit';
+import { inngest } from '$lib/server/inngest';
 
 export const GET: RequestHandler = async ({ params }) => {
   const { handle } = params;
@@ -23,11 +23,7 @@ export const GET: RequestHandler = async ({ params }) => {
       if (isUpdatedWithinAnHour(data[0].updated_at) && PUBLIC_NODE_ENV !== "development") {
         console.log(`[INFO] skip background process: ${handle}`);
       } else {
-        queueMicrotask(async () => {
-          console.log(`[INFO] start background process: ${handle}`);
-          const newResultAnalyze = await getRecordsAndAnalyze(handle);
-          await upsertRecords(handle, newResultAnalyze);
-        });
+        await inngest.send({name: "analyze/existing-user", data: {handle}});
       }
 
       return new Response(JSON.stringify(resultAnalyze), { status: 200 });
@@ -41,10 +37,7 @@ export const GET: RequestHandler = async ({ params }) => {
         const newResultAnalyze = await getRecordsAndAnalyze(handle);
 
         // バックグラウンド処理
-        queueMicrotask(async () => {
-          console.log(`[INFO] start background process: ${handle}`)
-          await upsertRecords(handle, newResultAnalyze);
-        });
+        await inngest.send({name: "analyze/new-user", data: {handle, newResultAnalyze}});
 
         return new Response(JSON.stringify(newResultAnalyze), { status: 200 });
       } else {
@@ -55,24 +48,6 @@ export const GET: RequestHandler = async ({ params }) => {
   } else {
     return new Response(JSON.stringify({ error: 'Invalid Handle' }), { status: 404 });
   }
-}
-
-async function getRecordsAndAnalyze (handle: string): Promise<App.ResultAnalyze> {
-  const records = await getLatestRecords(handle);
-  const resultAnalyze = await analyzeRecords(records);
-  console.log(`[INFO] get result_analyze: ${handle}`);
-  return resultAnalyze;
-}
-
-async function upsertRecords (handle: string, resultAnalyze: App.ResultAnalyze) {
-  await supabase
-    .from("records")
-    .upsert([{
-      handle,
-      result_analyze: transformAppToDb(resultAnalyze),
-      updated_at: new Date().toISOString(),
-    }]);
-  console.log(`[INFO] updated result_analyze: ${handle}`);
 }
 
 /**
