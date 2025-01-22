@@ -2,10 +2,10 @@
   import type { ResultAnalyze, RecentFriend } from '$types/api';
   import { onMount } from 'svelte';
   import { page } from '$app/state';
-  import AnalyzeGrid from '$lib/components/CardGrid.svelte';
-  import GraphGrid from '$lib/components/GraphGrid.svelte';
-  import CardWide from '$lib/components/CardWide.svelte';
-    import CardGrid from '$lib/components/CardGrid.svelte';
+  import CardWide from '$lib/components/stats/CardWide.svelte';
+  import CardGrid from '$lib/components/stats/CardGrid.svelte';
+  import LineGraph from '$lib/components/stats/LineGraph.svelte';
+  import BarGraph from '$lib/components/stats/BarGraph.svelte';
 
   let handle: string;
   let resultAnalyze: ResultAnalyze;
@@ -33,27 +33,37 @@
 
     // Prepare the summary data
     summary = [
-      { title: 'Last Action Time', content: resultAnalyze.activity.all.lastAt },
       { title: 'Average Interval', content: resultAnalyze.activity.all.averageInterval },
-      { title: 'Average Text Length', content: resultAnalyze.activity.post.averageLength }
+      { title: 'Last Action Time', content: resultAnalyze.activity.all.lastAt },
     ];
   });
 </script>
-
-<h1 class="text-2xl">Analysis for {handle}</h1>
 
 {#if error}
   <p style="color: red;">{error}</p>
 {:else if resultAnalyze}
   <div class="p-8 bg-gray-100 space-y-4">
-    <h2 class="text-2xl font-bold mb-6 text-gray-700">Result Analyze</h2>
-    
-    <!-- all activity -->
+    <h2 class="text-2xl font-bold mb-6 text-gray-700">Result Analyze for {handle}</h2>
+
+    <!-- Recent Friends -->
     <div>
-      <h3 class="text-xl font-semibold text-gray-800 mb-4">All Activity</h3>
-      <CardGrid
-        cards={summary}
+      <h3 class="text-xl font-semibold text-gray-800 mb-4">Relationship</h3>
+      <CardWide
+        title="Recent Friends"
+        items={resultAnalyze.relationship.map((friend) => ({
+          label: friend.displayName || '',
+          value: friend.score,
+          img: friend.avator,
+          handle: friend.handle,
+        }))}
       />
+    </div>
+
+    <!-- all activity -->
+    <div class="space-y-4">
+      <h3 class="text-xl font-semibold text-gray-800 mb-4">All Activity</h3>
+      <CardGrid cards={summary} />
+      <BarGraph data={resultAnalyze.activity.all.actionHeatmap} />
     </div>
     
     <!-- Post Activity -->
@@ -62,7 +72,7 @@
       <CardGrid
         cards={[
           { title: 'Avg Interval', content: resultAnalyze.activity.post.averageInterval },
-          { title: 'Avg Text Length', content: resultAnalyze.activity.post.averageLength }
+          { title: 'Avg Text Length', content: resultAnalyze.activity.post.averageLength },
         ]}
       />
       
@@ -73,10 +83,7 @@
         />
       {/if}
       
-      <GraphGrid 
-        sentimentHeatmap={resultAnalyze.activity.post.sentimentHeatmap}
-        activeHistgram={resultAnalyze.activity.all.actionHeatmap} 
-      />
+      <LineGraph data={resultAnalyze.activity.post.sentimentHeatmap} centerZero={true} />
     </div>
 
     <!-- Like Activity -->
@@ -101,23 +108,9 @@
       />
     </div>
     
-    <!-- Recent Friends -->
-    <div>
-      <h3 class="text-xl font-semibold text-gray-800 mb-4">Recent Friends</h3>
-      <CardWide
-        title="Recent Friends"
-        items={resultAnalyze.relationship.map((friend) => ({
-          label: friend.displayName || '',
-          value: friend.score,
-          img: friend.avator,
-          handle: friend.handle,
-        }))}
-      />
-    </div>
-
     <!-- Last Updated -->
     <div class="p-4 text-right text-sm text-gray-500">
-      <p>Last updated: {resultAnalyze.updatedAt}</p>
+      <p>Last updated: {new Date(resultAnalyze.updatedAt).toLocaleString()}</p>
     </div>
   </div>
 

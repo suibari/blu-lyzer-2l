@@ -14,7 +14,7 @@
     {#each items as item}
       <div class="flex flex-col items-center bg-gray-100 p-4 rounded-lg shadow-sm min-w-[150px]">
         {#if item.img}
-          <a href={`/stats/${item.handle}`} title="View Stats" class="block">
+          <a href={`/stats/${item.handle}`} title="View Stats" class="block" data-sveltekit-reload >
             <img 
               src="{item.img}" 
               alt="{item.label}" 
