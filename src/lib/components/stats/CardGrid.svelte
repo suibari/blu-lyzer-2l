@@ -5,6 +5,8 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
   {#each cards as card}
-    <Card {...card} />
+    {#if card.content}
+      <Card {...card} />  
+    {/if}
   {/each}
 </div>

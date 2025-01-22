@@ -1,13 +1,11 @@
 import { EXCLUDE_WORDS, MIN_WORD_COUNT, MIN_WORD_LENGTH } from './config/excludeWords';
-import type { wordFreq } from '$types/api';
 import { fetchSentimentAnalysis } from './fetchAnalyzer';
-import type { RecordExt } from '$types/atproto';
 
-export async function getNounFrequencies(posts: RecordExt[]): Promise<{
-  wordFreqMap: wordFreq[];
+export async function getNounFrequencies(posts: App.RecordExt[]): Promise<{
+  wordFreqMap: App.wordFreq[];
   sentimentHeatmap: number[];
 }> {
-  const wordFreqMap: wordFreq[] = [];
+  const wordFreqMap: App.wordFreq[] = [];
   const sentimentHeatmap = new Array(24).fill(0);
 
   const textsArray = posts.map(post => post.value.text || "");

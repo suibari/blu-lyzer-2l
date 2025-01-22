@@ -1,48 +1,25 @@
 <script>
+  import Footer from "$lib/components/Footer.svelte";
   import "../app.css";
+  import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, FooterIcon } from 'flowbite-svelte';
 </script>
 
-<style>
-  body {
-    background: linear-gradient(to bottom, #1e3a8a, #2563eb, #3b82f6);
-    color: #ffffff;
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-
-  .container {
-    max-width: 1280px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .content {
-    padding-top: 12px;
-    padding-bottom: 12px;
-  }
-
-  .card {
-    background-color: #ffffff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
-  }
-
-  .card-header {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #2563eb;
-  }
-
-  h1, h2, h3 {
-    color: #1e3a8a;
-  }
+<div class="flex flex-col min-h-screen">
+  <Navbar class="text-gray-100 bg-primary-900">
+    <NavBrand href="/">
+      <span class="font-orbitron text-2xl ml-2">Blu-lyzer</span>
+    </NavBrand>
+    <NavHamburger />
+    <NavUl>
+      <NavLi class="md:text-gray-100 sm:text-primary-900">About</NavLi>
+      <NavLi class="md:text-gray-100 sm:text-primary-900">Disclaimer</NavLi>
+      <NavLi class="md:text-gray-100 sm:text-primary-900">ChangeLog</NavLi>
+    </NavUl>
+  </Navbar>
   
-  /* ...他のスタイル... */
-</style>
-
-<main class="container">
-  <slot></slot>
-</main>
+  <main class="container flex-1 mx-auto">
+    <slot />
+  </main>
+  
+  <Footer />  
+</div>

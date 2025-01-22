@@ -1,10 +1,9 @@
-import { updated } from '$app/state';
+import { PUBLIC_NODE_ENV } from '$env/static/public';
 import { getLatestRecords } from '$lib/server/bluesky/getLatestRecords';
 import SessionManager from '$lib/server/bluesky/sessionManager';
 import { analyzeRecords } from '$lib/server/core/analyzeRecords';
 import { transformAppToDb, transformDbToApp } from '$lib/server/core/transformType';
 import { supabase } from '$lib/server/supabase';
-import type { ResultAnalyze, ResultAnalyzeDB } from '$types/api';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ params }) => {
@@ -21,7 +20,7 @@ export const GET: RequestHandler = async ({ params }) => {
       const resultAnalyze = transformDbToApp(data[0].result_analyze, data[0].updated_at);
 
       // バックグラウンド処理
-      if (isUpdatedWithinAnHour(data[0].updated_at)) {
+      if (isUpdatedWithinAnHour(data[0].updated_at) && PUBLIC_NODE_ENV !== "development") {
         console.log(`[INFO] skip background process: ${handle}`);
       } else {
         queueMicrotask(async () => {
@@ -58,14 +57,14 @@ export const GET: RequestHandler = async ({ params }) => {
   }
 }
 
-async function getRecordsAndAnalyze (handle: string): Promise<ResultAnalyze> {
+async function getRecordsAndAnalyze (handle: string): Promise<App.ResultAnalyze> {
   const records = await getLatestRecords(handle);
   const resultAnalyze = await analyzeRecords(records);
   console.log(`[INFO] get result_analyze: ${handle}`);
   return resultAnalyze;
 }
 
-async function upsertRecords (handle: string, resultAnalyze: ResultAnalyze) {
+async function upsertRecords (handle: string, resultAnalyze: App.ResultAnalyze) {
   await supabase
     .from("records")
     .upsert([{

@@ -1,21 +1,19 @@
 import type { Record } from '@atproto/api/dist/client/types/com/atproto/repo/listRecords';
 import { getNounFrequencies } from "./getNounFrequencies";
-import type { RecentFriend, ResultAnalyze } from "$types/api";
-import type { RecordExt } from '$types/atproto';
 import SessionManager from '../bluesky/sessionManager';
 
 const SCORE_REPLY = 10;
 const SCORE_LIKE = 1;
 
 export type RecordMap = {
-  posts: RecordExt[],
-  likes: RecordExt[],
-  repost: RecordExt[]
+  posts: App.RecordExt[],
+  likes: App.RecordExt[],
+  repost: App.RecordExt[]
 }
 
 const sessionManager = SessionManager.getInstance();
 
-export async function analyzeRecords(records: RecordMap): Promise<ResultAnalyze> {
+export async function analyzeRecords(records: RecordMap): Promise<App.ResultAnalyze> {
   const allRecords = collectAllRecords(records);
 
   // 頻出単語分析
@@ -38,10 +36,12 @@ export async function analyzeRecords(records: RecordMap): Promise<ResultAnalyze>
       },
       like: {
         averageInterval: calculateAverageInterval(records.likes),
+        actionHeatmap: generateActiveHeatmap(records.likes),
         lastAt: getLastActionTime(records.likes),
       },
       repost: {
         averageInterval: calculateAverageInterval(records.repost),
+        actionHeatmap: generateActiveHeatmap(records.repost),
         lastAt: getLastActionTime(records.repost),
       },
     },
@@ -61,7 +61,7 @@ function collectAllRecords(records: RecordMap) {
 }
 
 // Generate activity histogram
-function generateActiveHeatmap(records: RecordExt[]): number[] {
+function generateActiveHeatmap(records: App.RecordExt[]): number[] {
   const heatmap = new Array(24).fill(0);
   records.forEach(record => {
     const hourKey = getJSTHour(record);
@@ -71,14 +71,14 @@ function generateActiveHeatmap(records: RecordExt[]): number[] {
 }
 
 // Get hour in JST (UTC+9)
-function getJSTHour(record: RecordExt) {
+function getJSTHour(record: App.RecordExt) {
   const utcDate = new Date(record.value.createdAt);
   const jstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000); // Convert to JST
   return jstDate.getUTCHours();
 }
 
 // Get last action time
-function getLastActionTime(records: RecordExt[]): string | null {
+function getLastActionTime(records: App.RecordExt[]): string | null {
   if (records.length === 0) return null;
 
   // Sort by createdAt in descending order
@@ -90,7 +90,7 @@ function getLastActionTime(records: RecordExt[]): string | null {
 }
 
 // Calculate average text length for posts
-function calculateAverageTextLength(posts: RecordExt[]) {
+function calculateAverageTextLength(posts: App.RecordExt[]) {
   const totalTextLength = posts.reduce((total, post) => {
     return total + (post.value.text?.length || 0);
   }, 0);
@@ -99,8 +99,8 @@ function calculateAverageTextLength(posts: RecordExt[]) {
 }
 
 // Get recent friends with reply and like score
-async function getRecentFriends(posts: RecordExt[], likes: RecordExt[]) {
-  let recentFriends: RecentFriend[] = [];
+async function getRecentFriends(posts: App.RecordExt[], likes: App.RecordExt[]) {
+  let recentFriends: App.RecentFriend[] = [];
   let didReply = extractDidFromReplies(posts);
   let didLike = extractDidFromLikes(likes);
 
@@ -129,7 +129,7 @@ async function getRecentFriends(posts: RecordExt[], likes: RecordExt[]) {
 }
 
 // Extract DID from post replies
-function extractDidFromReplies(posts: RecordExt[]) {
+function extractDidFromReplies(posts: App.RecordExt[]) {
   let didReply: string[] = [];
   posts.forEach(post => {
     const uri = post.value.reply?.parent.uri;
@@ -140,7 +140,7 @@ function extractDidFromReplies(posts: RecordExt[]) {
 }
 
 // Extract DID from likes
-function extractDidFromLikes(likes: RecordExt[]) {
+function extractDidFromLikes(likes: App.RecordExt[]) {
   let didLike: string[] = [];
   likes.forEach(like => {
     const uri = like.value.subject?.uri;
@@ -151,7 +151,7 @@ function extractDidFromLikes(likes: RecordExt[]) {
 }
 
 // Aggregate recent friends by DID and score type
-function aggregateRecentFriends(dids: string[], recentFriends: RecentFriend[], score: number) {
+function aggregateRecentFriends(dids: string[], recentFriends: App.RecentFriend[], score: number) {
   dids.forEach(did => {
     let flagFound = false;
     for (const node of recentFriends) {
@@ -171,12 +171,12 @@ function aggregateRecentFriends(dids: string[], recentFriends: RecentFriend[], s
 }
 
 // Sort recent friends by score in descending order
-function sortRecentFriendsByScore(recentFriends: RecentFriend[]) {
+function sortRecentFriendsByScore(recentFriends: App.RecentFriend[]) {
   return recentFriends.sort((a, b) => b.score - a.score);
 }
 
 // Calculate the average interval between posts/likes
-function calculateAverageInterval(records: RecordExt[]): number {
+function calculateAverageInterval(records: App.RecordExt[]): number {
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Filter last 7 days
   const recentRecords = records.filter(record => new Date(record.value.createdAt) >= oneWeekAgo);
 

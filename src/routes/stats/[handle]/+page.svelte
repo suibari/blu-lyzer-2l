@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { ResultAnalyze, RecentFriend } from '$types/api';
   import { onMount } from 'svelte';
   import { page } from '$app/state';
   import CardWide from '$lib/components/stats/CardWide.svelte';
@@ -8,7 +7,7 @@
   import BarGraph from '$lib/components/stats/BarGraph.svelte';
 
   let handle: string;
-  let resultAnalyze: ResultAnalyze;
+  let resultAnalyze: App.ResultAnalyze;
   let error: string | null = null;
   let summary: Array<{ title: string; content: string | number | null }> = [];
 
@@ -55,6 +54,8 @@
           value: friend.score,
           img: friend.avator,
           handle: friend.handle,
+          replies: friend.replyCount,
+          likes: friend.likeCount,
         }))}
       />
     </div>
@@ -63,7 +64,11 @@
     <div class="space-y-4">
       <h3 class="text-xl font-semibold text-gray-800 mb-4">All Activity</h3>
       <CardGrid cards={summary} />
-      <BarGraph data={resultAnalyze.activity.all.actionHeatmap} />
+      <BarGraph
+        postData={resultAnalyze.activity.post.actionHeatmap}
+        likeData={resultAnalyze.activity.like.actionHeatmap}
+        repostData={resultAnalyze.activity.repost.actionHeatmap}
+      />
     </div>
     
     <!-- Post Activity -->
@@ -116,5 +121,5 @@
 
 
 {:else}
-  <p>Loading...</p>
+  <p class="text-center justify-center">Loading...</p>
 {/if}

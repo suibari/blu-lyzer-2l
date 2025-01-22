@@ -1,2 +1,5 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script>
+  import Welcome from "$lib/components/Welcome.svelte";
+</script>
+
+<Welcome LATEST_VER="0.3.0" />

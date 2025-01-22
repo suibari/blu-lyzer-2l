@@ -1,6 +1,4 @@
-import type { ResultAnalyze } from "$types/api";
-
-export const transformDbToApp = (data: any, updated_at: string): ResultAnalyze => {
+export const transformDbToApp = (data: any, updated_at: string): App.ResultAnalyze => {
   return {
     activity: {
       all: {
@@ -18,10 +16,12 @@ export const transformDbToApp = (data: any, updated_at: string): ResultAnalyze =
       },
       like: {
         averageInterval: data.averageLikeInterval || null,
+        actionHeatmap: data.likeHistgram || null,
         lastAt: data.lastLikeTime || null,
       },
       repost: {
         averageInterval: data.averageRepostInterval || null,
+        actionHeatmap: data.repostHistgram || null,
         lastAt: data.lastRepostTime || null,
       },
     },
@@ -30,7 +30,7 @@ export const transformDbToApp = (data: any, updated_at: string): ResultAnalyze =
   };
 }
 
-export const transformAppToDb = (resultAnalyze: ResultAnalyze): any => {
+export const transformAppToDb = (resultAnalyze: App.ResultAnalyze): any => {
   return {
     // all
     averageInterval: resultAnalyze.activity.all.averageInterval,
@@ -45,9 +45,11 @@ export const transformAppToDb = (resultAnalyze: ResultAnalyze): any => {
     lastPostTime: resultAnalyze.activity.post.lastAt,
     // like
     averageLikeInterval: resultAnalyze.activity.like.averageInterval,
+    likeHistgram: resultAnalyze.activity.like.actionHeatmap,
     lastLikeTime: resultAnalyze.activity.like.lastAt,
     // repost 
     averageRepostInterval: resultAnalyze.activity.repost.averageInterval,
+    repostHistgram: resultAnalyze.activity.repost.actionHeatmap,
     lastRepostTime: resultAnalyze.activity.repost.lastAt,
     // relationship
     recentFriends: resultAnalyze.relationship,

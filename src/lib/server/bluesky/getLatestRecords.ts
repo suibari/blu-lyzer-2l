@@ -1,10 +1,9 @@
-import type { RecordExt } from '$types/atproto';
 import SessionManager from './sessionManager';
 
 export type RecordMap = {
-  posts: RecordExt[];
-  likes: RecordExt[];
-  repost: RecordExt[];
+  posts: App.RecordExt[];
+  likes: App.RecordExt[];
+  repost: App.RecordExt[];
 };
 
 const sessionManager = SessionManager.getInstance();
@@ -19,7 +18,7 @@ export async function getLatestRecords(handle: string): Promise<RecordMap> {
 
   const agent = sessionManager.getAgent();
 
-  const fetchRecords = async (collection: string): Promise<RecordExt[]> => {
+  const fetchRecords = async (collection: string): Promise<App.RecordExt[]> => {
     try {
       const response = await agent.com.atproto.repo.listRecords({
         repo: handle,
@@ -29,7 +28,7 @@ export async function getLatestRecords(handle: string): Promise<RecordMap> {
 
       const records = response?.data?.records;
       if (Array.isArray(records)) {
-        return records as RecordExt[]; // 型アサーション
+        return records as App.RecordExt[]; // 型アサーション
       } else {
         return [];
       }

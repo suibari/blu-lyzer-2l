@@ -5,6 +5,8 @@
     label: string;
     value: string | number;
     handle?: string;
+    replies?: number; // 返信数
+    likes?: number; // いいね数
   }>;
 </script>
 
@@ -14,7 +16,7 @@
     {#each items as item}
       <div class="flex flex-col items-center bg-gray-100 p-4 rounded-lg shadow-sm min-w-[150px]">
         {#if item.img}
-          <a href={`/stats/${item.handle}`} title="View Stats" class="block" data-sveltekit-reload >
+          <a href={`/stats/${item.handle}`} title="View Stats" class="block" data-sveltekit-reload>
             <img 
               src="{item.img}" 
               alt="{item.label}" 
@@ -23,8 +25,22 @@
           </a>
         {/if}
         <p class="text-sm font-semibold text-gray-700">
-          <span class="text-gray-500">{item.label}:</span> {item.value}
+          <span class="text-gray-500">{item.label}:</span> {item.value}pt
         </p>
+        {#if item.replies || item.likes}
+          <div class="text-xs text-gray-600 mt-2">
+            {#if item.replies}
+              <span class="mr-2">
+                <strong>{item.replies}</strong> replies
+              </span>
+            {/if}
+            {#if item.likes}
+              <span>
+                <strong>{item.likes}</strong> likes
+              </span>
+            {/if}
+          </div>
+        {/if}
       </div>
     {/each}
   </div>
