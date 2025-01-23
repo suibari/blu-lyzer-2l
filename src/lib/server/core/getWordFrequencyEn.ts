@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // pn_en.dicファイルの読み込み
-const dictionaryPath = (PUBLIC_NODE_ENV === "development") ? 'src/lib/server/core/dict/pn_en.dic' : resolve(__dirname, 'src/lib/server/core/dict/pn_en.dic') ; // for Vercel
+const dictionaryPath = (PUBLIC_NODE_ENV === "development") ? 'src/lib/server/core/dict/pn_en.dic' : resolve(__dirname, '../../../../src/lib/server/core/dict/pn_en.dic') ; // for Vercel
 const sentimentDictionary: Record<string, number> = Object.create(null);
 readFileSync(dictionaryPath, 'utf-8')
   .split('\n')
