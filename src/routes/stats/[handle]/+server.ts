@@ -56,7 +56,7 @@ export const GET: RequestHandler = async ({ params }) => {
       return new Response(JSON.stringify({ resultAnalyze, percentiles, profile }), { status: 200 });
     } else {
       // DBに存在しない: 新規ユーザ
-      const newResultAnalyze = await getRecordsAndAnalyze(handle);
+      const newResultAnalyze = await getRecordsAndAnalyze(handle, 100);
       const percentiles = await getPercentilesForProperties(handle, propertyNames);
 
       // バックグラウンド処理

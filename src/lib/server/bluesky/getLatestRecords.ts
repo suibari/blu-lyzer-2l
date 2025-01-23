@@ -13,25 +13,38 @@ const sessionManager = SessionManager.getInstance();
  * @param handle The Bluesky handle of the user
  * @returns Promise<RecordMap> Containing posts, likes, and reposts
  */
-export async function getLatestRecords(handle: string): Promise<RecordMap> {
+export async function getLatestRecords(handle: string, limit: number): Promise<RecordMap> {
   await sessionManager.createOrRefreshSession();
 
   const agent = sessionManager.getAgent();
 
-  const fetchRecords = async (collection: string): Promise<App.RecordExt[]> => {
+  const fetchRecords = async (collection: string, limit: number): Promise<App.RecordExt[]> => {
     try {
-      const response = await agent.com.atproto.repo.listRecords({
-        repo: handle,
-        collection,
-        limit: 100,
-      });
+      let records: App.RecordExt[] = [];
+      let cursor: string | undefined = undefined;
 
-      const records = response?.data?.records;
-      if (Array.isArray(records)) {
-        return records as App.RecordExt[]; // 型アサーション
-      } else {
-        return [];
+      while (records.length < limit) {
+        const response = await agent.com.atproto.repo.listRecords({
+          repo: handle,
+          collection,
+          limit: Math.min(limit - records.length, 100), // 最大100件ずつ取得
+          cursor,
+        });
+
+        if (response?.data?.records) {
+          records = records.concat(response.data.records as App.RecordExt[]);
+          cursor = response.data.cursor;
+
+          // cursor が存在しない場合は、すべてのレコードを取得済みと判断
+          if (!cursor) {
+            break;
+          }
+        } else {
+          break; // レスポンスが期待したデータでない場合はループ終了
+        }
       }
+
+      return records;
     } catch (e) {
       console.error(e);
       console.warn(`[WARN] Failed to fetch records for ${collection}, handle: ${handle}`);
@@ -40,9 +53,9 @@ export async function getLatestRecords(handle: string): Promise<RecordMap> {
   };
 
   const [postRecords, likeRecords, repostRecords] = await Promise.all([
-    fetchRecords('app.bsky.feed.post'),
-    fetchRecords('app.bsky.feed.like'),
-    fetchRecords('app.bsky.feed.repost'),
+    fetchRecords('app.bsky.feed.post', limit),
+    fetchRecords('app.bsky.feed.like', limit),
+    fetchRecords('app.bsky.feed.repost', limit),
   ]);
 
   return {

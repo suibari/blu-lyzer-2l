@@ -12,7 +12,7 @@ const doAnalyzeAndUpsertExistingUser = inngest.createFunction(
   async ({event, step}) => {
     const handle = event.data.handle
     console.log(`[INFO][INNGEST] start background process: ${handle}`);
-    const newResultAnalyze = await getRecordsAndAnalyze(handle);
+    const newResultAnalyze = await getRecordsAndAnalyze(handle, 400);
     await upsertRecords(handle, newResultAnalyze);
   }
 )
@@ -23,16 +23,15 @@ const doAnalyzeAndUpsertNewUser = inngest.createFunction(
   async ({event, step}) => {
     const handle = event.data.handle
     const newResultAnalyze = event.data.newResultAnalyze
-    console.log(`[INFO] start background process: ${handle}`)
+    console.log(`[INFO][INNGEST] start background process: ${handle}`)
     await upsertRecords(handle, newResultAnalyze);
   }
 )
 
-export async function getRecordsAndAnalyze (handle: string): Promise<App.ResultAnalyze> {
-  const records = await getLatestRecords(handle);
-  const resultAnalyze = await analyzeRecords(records);
-  console.log(resultAnalyze)
-  console.log(`[INFO] get result_analyze: ${handle}`);
+export async function getRecordsAndAnalyze (handle: string, limit: number): Promise<App.ResultAnalyze> {
+  const records = await getLatestRecords(handle, limit);
+  const resultAnalyze = await analyzeRecords(handle, records);
+  console.log(`[INFO][INNGEST] get result_analyze: ${handle}`);
   return resultAnalyze;
 }
 
@@ -44,7 +43,7 @@ export async function upsertRecords (handle: string, resultAnalyze: App.ResultAn
       result_analyze: transformAppToDb(resultAnalyze),
       updated_at: new Date().toISOString(),
     }]);
-  console.log(`[INFO] updated result_analyze: ${handle}`);
+  console.log(`[INFO][INNGEST] updated result_analyze: ${handle}`);
 }
 
 export const functions = [

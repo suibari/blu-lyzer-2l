@@ -13,7 +13,7 @@ export type RecordMap = {
 
 const sessionManager = SessionManager.getInstance();
 
-export async function analyzeRecords(records: RecordMap): Promise<App.ResultAnalyze> {
+export async function analyzeRecords(handle: string, records: RecordMap): Promise<App.ResultAnalyze> {
   const allRecords = collectAllRecords(records);
 
   // 頻出単語分析
@@ -45,7 +45,7 @@ export async function analyzeRecords(records: RecordMap): Promise<App.ResultAnal
         lastAt: getLastActionTime(records.repost),
       },
     },
-    relationship: await getRecentFriends(records.posts, records.likes),
+    relationship: await getRecentFriends(handle, records.posts, records.likes),
     updatedAt: new Date().toISOString(),
   }
 }
@@ -99,7 +99,7 @@ function calculateAverageTextLength(posts: App.RecordExt[]) {
 }
 
 // Get recent friends with reply and like score
-async function getRecentFriends(posts: App.RecordExt[], likes: App.RecordExt[]) {
+async function getRecentFriends(handle: string, posts: App.RecordExt[], likes: App.RecordExt[]) {
   let recentFriends: App.RecentFriend[] = [];
   let didReply = extractDidFromReplies(posts);
   let didLike = extractDidFromLikes(likes);
@@ -107,8 +107,11 @@ async function getRecentFriends(posts: App.RecordExt[], likes: App.RecordExt[]) 
   recentFriends = aggregateRecentFriends(didReply, recentFriends, SCORE_REPLY);
   recentFriends = aggregateRecentFriends(didLike, recentFriends, SCORE_LIKE);
 
+  // 自分を除外
+  const recentFriendsFiltered = recentFriends.filter(friend => friend.displayName !== handle );
+
   // getProfilesが25までなのでslice
-  const recentFriendsSorted = sortRecentFriendsByScore(recentFriends);
+  const recentFriendsSorted = sortRecentFriendsByScore(recentFriendsFiltered);
   const recentFriendsSliced = recentFriendsSorted.slice(0, 25);
 
   // getProfilesし、recentFriendsに名前やアバターを追加

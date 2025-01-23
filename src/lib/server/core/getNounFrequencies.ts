@@ -40,10 +40,11 @@ export async function getNounFrequencies(posts: App.RecordExt[]): Promise<{
 
     // count順に降順ソート
     wordFreqMap.sort((a, b) => b.count - a.count);
+    const wordFreqMapSliced = wordFreqMap.slice(0, 100);
 
   } catch (err) {
     console.warn('[WARN] Error in word analyze:', err);
   }
 
-  return { wordFreqMap, sentimentHeatmap };
+  return { wordFreqMap: wordFreqMap.slice(0, 100), sentimentHeatmap };
 }
