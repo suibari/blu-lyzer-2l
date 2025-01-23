@@ -87,6 +87,14 @@ declare global {
 			lastRepostTime?: string[];
 			// relationship
 			recentFriends: RecentFriend[];
-		}		
+		}
+
+		export interface Percentiles {
+			averageInterval: number;
+			averagePostsInterval: number;
+			averageTextLength: number;
+			averageLikeInterval?: number;
+			averageRepostInterval?: number;
+		}
 	}
 }

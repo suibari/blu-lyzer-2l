@@ -8,8 +8,8 @@
 
   let handle: string;
   let resultAnalyze: App.ResultAnalyze;
+  let percentiles: App.Percentiles;
   let error: string | null = null;
-  let summary: Array<{ title: string; content: string | number | null }> = [];
 
   // ------------------------
   // fetch
@@ -20,7 +20,9 @@
     try {
       const res = await fetch(`/stats/${handle}`);
       if (res.ok) {
-        resultAnalyze = await res.json();
+        const data = await res.json();
+        resultAnalyze = data.resultAnalyze;
+        percentiles = data.percentiles;
       } else {
         error = `Error fetching data: ${res.statusText}`;
       }
@@ -29,12 +31,6 @@
         error = `Error fetching data: ${err.message}`;
       }
     }
-
-    // Prepare the summary data
-    summary = [
-      { title: 'Average Interval', content: resultAnalyze.activity.all.averageInterval },
-      { title: 'Last Action Time', content: resultAnalyze.activity.all.lastAt },
-    ];
   });
 </script>
 
@@ -55,7 +51,7 @@
           img: friend.avator,
           handle: friend.handle,
           replies: friend.replyCount,
-          likes: friend.likeCount,
+          likes: friend.likeCount
         }))}
       />
     </div>
@@ -63,7 +59,17 @@
     <!-- all activity -->
     <div class="space-y-4">
       <h3 class="text-xl font-semibold text-gray-800 mb-4">All Activity</h3>
-      <CardGrid cards={summary} />
+      <CardGrid cards={[
+        {
+          title: 'Average Interval',
+          content: resultAnalyze.activity.all.averageInterval,
+          percentile: percentiles.averageInterval,
+        },
+        {
+          title: 'Last Action Time',
+          content: resultAnalyze.activity.all.lastAt,
+        },
+      ]} />
       <BarGraph
         postData={resultAnalyze.activity.post.actionHeatmap}
         likeData={resultAnalyze.activity.like.actionHeatmap}
@@ -76,8 +82,16 @@
       <h3 class="text-xl font-semibold text-gray-800 mb-4">Post Activity</h3>
       <CardGrid
         cards={[
-          { title: 'Avg Interval', content: resultAnalyze.activity.post.averageInterval },
-          { title: 'Avg Text Length', content: resultAnalyze.activity.post.averageLength },
+          { 
+            title: 'Avg Interval',
+            content: resultAnalyze.activity.post.averageInterval,
+            percentile: percentiles.averagePostsInterval,
+          },
+          {
+            title: 'Avg Text Length',
+            content: resultAnalyze.activity.post.averageLength,
+            percentile: percentiles.averageTextLength,
+          },
         ]}
       />
       
@@ -96,8 +110,15 @@
       <h3 class="text-xl font-semibold text-gray-800 mb-4">Like Activity</h3>
       <CardGrid
         cards={[
-          { title: 'Avg Interval', content: resultAnalyze.activity.like.averageInterval },
-          { title: 'Last Activity', content: resultAnalyze.activity.like.lastAt }
+          {
+            title: 'Avg Interval',
+            content: resultAnalyze.activity.like.averageInterval,
+            percentile: percentiles.averageLikeInterval,
+          },
+          {
+            title: 'Last Activity',
+            content: resultAnalyze.activity.like.lastAt
+          },
         ]}
       />
     </div>
@@ -107,8 +128,15 @@
       <h3 class="text-xl font-semibold text-gray-800 mb-4">Repost Activity</h3>
       <CardGrid
         cards={[
-          { title: 'Avg Interval', content: resultAnalyze.activity.repost.averageInterval },
-          { title: 'Last Activity', content: resultAnalyze.activity.repost.lastAt }
+          {
+            title: 'Avg Interval',
+            content: resultAnalyze.activity.repost.averageInterval,
+            percentile: percentiles.averageRepostInterval,
+          },
+          {
+            title: 'Last Activity',
+            content: resultAnalyze.activity.repost.lastAt
+          },
         ]}
       />
     </div>

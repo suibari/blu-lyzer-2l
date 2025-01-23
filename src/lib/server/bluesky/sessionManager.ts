@@ -29,24 +29,33 @@ export default class SessionManager {
       .select('access_jwt')
       .eq('handle', this.identifier)
       .single();
-
-    if (error || !data) {
-      console.warn(`[WARN] No existing session found. Creating a new session for ${this.identifier}.`);
-      await this.createSession();
-    } else {
-      const accessJwt = data.access_jwt;
-      this.agent.setHeader('Authorization', `Bearer ${accessJwt}`);
-      
-      // セッション確認
-      try {
-        await this.agent.app.bsky.feed.getTimeline();
-      } catch (err: any) {
-        if (err.error === 'ExpiredToken') {
-          console.info('[INFO] Session expired. Refreshing session.');
-          await this.refreshSession();
-        } else {
-          throw new Error(`[ERROR] Failed to validate session: ${err.message}`);
-        }
+  
+    if (error) {
+      console.warn(`[WARN] Error retrieving session for ${this.identifier}:`, error.message);
+    }
+  
+    if (!data || !data.access_jwt) {
+      console.info(`[INFO] No valid session found. Creating a new session for ${this.identifier}.`);
+      await this.createSession(); // 新しいセッションを作成
+      return;
+    }
+  
+    const accessJwt = data.access_jwt;
+  
+    // セッションを設定
+    this.agent.setHeader('Authorization', `Bearer ${accessJwt}`);
+  
+    try {
+      // トークンの有効性を確認
+      await this.agent.app.bsky.feed.getTimeline();
+    } catch (err: any) {
+      // 有効期限切れならセッションを更新、それ以外はエラーをスロー
+      if (err.error === 'ExpiredToken') {
+        console.info(`[INFO] Token expired. Refreshing session for ${this.identifier}.`);
+        await this.refreshSession();
+      } else {
+        console.error(`[ERROR] Error validating session for ${this.identifier}:`, err.message);
+        throw err;
       }
     }
   }
