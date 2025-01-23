@@ -44,9 +44,11 @@
   });
 </script>
 
-<div class="p-4 bg-white shadow rounded-lg">
-  <h3 class="text-xl font-semibold text-gray-800 mb-4">Sentiment Heatmap</h3>
-  <div class="relative w-full h-64"> <!-- 親要素のサイズに合わせる -->
-    <canvas id="lineChart"></canvas>
+{#if data.find(d => d !== 0)}
+  <div class="p-4 bg-white shadow rounded-lg">
+    <h3 class="text-xl font-semibold text-gray-800 mb-4">Sentiment Heatmap</h3>
+    <div class="relative w-full h-64"> <!-- 親要素のサイズに合わせる -->
+      <canvas id="lineChart"></canvas>
+    </div>
   </div>
-</div>
+{/if}

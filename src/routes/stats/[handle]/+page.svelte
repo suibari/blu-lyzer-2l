@@ -96,7 +96,6 @@
         title="Recent Friends"
         items={resultAnalyze.relationship.map((friend) => ({
           label: friend.displayName || '',
-          value: friend.score,
           img: friend.avator,
           handle: friend.handle,
           replies: friend.replyCount,

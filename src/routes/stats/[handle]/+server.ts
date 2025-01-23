@@ -27,6 +27,7 @@ export const GET: RequestHandler = async ({ params }) => {
     if (!success || !profile) {
       throw new Error('User Not found in Bluesky'); // Blueskyに存在しない場合
     }
+    const did = profile.did;
 
     // 既存ユーザ or 新規ユーザ
     const { data } = await supabase
@@ -43,13 +44,13 @@ export const GET: RequestHandler = async ({ params }) => {
       if (isUpdatedWithinAnHour(data.updated_at) && PUBLIC_NODE_ENV !== "development") {
         console.log(`[INFO] skip background process: ${handle}`);
       } else {
-        await inngest.send({ name: "analyze/existing-user", data: { handle } });
+        await inngest.send({ name: "analyze/existing-user", data: { handle, did } });
       }
 
       return new Response(JSON.stringify({ resultAnalyze, percentiles: data.percentiles, profile }), { status: 200 });
     } else {
       // DBに存在しない: 新規ユーザ
-      const newResultAnalyze = await getRecordsAndAnalyze(handle, 100);
+      const newResultAnalyze = await getRecordsAndAnalyze(handle, did, 100);
 
       // バックグラウンド処理
       await inngest.send({ name: "analyze/new-user", data: { handle, newResultAnalyze } });

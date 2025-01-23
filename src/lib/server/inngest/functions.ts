@@ -4,7 +4,7 @@ import { analyzeRecords } from "../core/analyzeRecords";
 import { transformAppToDb } from "../core/transformType";
 import { supabase } from "../supabase";
 
-const propertyNames = [
+export const propertyNames = [
   "averageInterval",
   "averagePostsInterval",
   "averageLikeInterval",
@@ -12,33 +12,9 @@ const propertyNames = [
   "averageTextLength",
 ];
 
-export const doAnalyzeAndUpsertExistingUser = inngest.createFunction(
-  { id: "analyze-upsert" },
-  { event: "analyze/existing-user" },
-  async ({event, step}) => {
-    const handle = event.data.handle
-    console.log(`[INFO][INNGEST] start background process: ${handle}`);
-    const newResultAnalyze = await getRecordsAndAnalyze(handle, 400);
-    const percentiles = await getPercentilesForProperties(handle, propertyNames);
-    await upsertRecords(handle, newResultAnalyze, percentiles);
-  }
-)
-
-export const doAnalyzeAndUpsertNewUser = inngest.createFunction(
-  { id: "analyze_upsert" },
-  { event: "analyze/new-user" },
-  async ({event, step}) => {
-    const handle = event.data.handle
-    const newResultAnalyze = event.data.newResultAnalyze;
-    console.log(`[INFO][INNGEST] start background process: ${handle}`);
-    const percentiles = await getPercentilesForProperties(handle, propertyNames);
-    await upsertRecords(handle, newResultAnalyze, percentiles);
-  }
-)
-
-export async function getRecordsAndAnalyze (handle: string, limit: number): Promise<App.ResultAnalyze> {
+export async function getRecordsAndAnalyze (handle: string, did: string, limit: number): Promise<App.ResultAnalyze> {
   const records = await getLatestRecords(handle, limit);
-  const resultAnalyze = await analyzeRecords(handle, records);
+  const resultAnalyze = await analyzeRecords(did, records);
   console.log(`[INFO][INNGEST] get result_analyze: ${handle}`);
   return resultAnalyze;
 }
@@ -61,7 +37,7 @@ export async function upsertRecords (handle: string, resultAnalyze: App.ResultAn
  * @param propertyNames 複数のプロパティ名
  * @returns 各プロパティのパーセンタイルと値を含むオブジェクト
  */
-async function getPercentilesForProperties(handle: string, propertyNames: string[]) {
+export async function getPercentilesForProperties(handle: string, propertyNames: string[]) {
   const percentiles: Record<string, { value: number } | null> = {};
 
   // 各プロパティ名について順次RPCを実行
