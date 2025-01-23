@@ -7,9 +7,9 @@
   export let percentiles;
 </script>
 
-<div class="w-full mx-auto p-6 bg-white shadow-lg rounded-lg flex">
+<div class="w-full mx-auto p-6 bg-white shadow-lg rounded-lg flex flex-col md:flex-row">
   <!-- Left side: Profile -->
-  <div class="flex flex-col items-start w-1/2">
+  <div class="flex flex-col items-start">
     <!-- Avatar and DisplayName -->
     <div class="flex items-center mb-4">
       <img src={String(profile.avatar)} alt="Avatar" class="w-16 h-16 rounded-full border-2 border-gray-300 mr-4" />
@@ -21,7 +21,7 @@
   </div>
 
   <!-- Right side: Radar Chart -->
-  <div class="w-1/2 pl-8">
+  <div class="w-full md:w-1/2 mt-4 md:mt-0 md:pl-8">
     <div class="w-full h-full border border-gray-300 rounded-lg">
       <RadarGraph
         {profile}

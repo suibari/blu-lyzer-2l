@@ -7,6 +7,7 @@
   import BarGraph from '$lib/components/stats/BarGraph.svelte';
   import Profile from '$lib/components/stats/Profile.svelte';
   import type { AppBskyActorProfile } from '@atproto/api';
+  import IcSharpShare from '$lib/components/icons/IcSharpShare.svelte';
 
   let handle: string;
   let resultAnalyze: App.ResultAnalyze;
@@ -37,13 +38,49 @@
       }
     }
   });
+
+  // ------------------------
+  // web share API
+  // ------------------------
+  const shareResult = async () => {
+    const shareText = `Check out the results for ${handle} on Bluesky Analysis!`;
+    const shareUrl = `https://blu-lyzer.suibari.com/stats/${handle}`;
+
+    if (navigator.share) {
+      // Web Share API をサポートしている場合
+      try {
+        await navigator.share({
+          title: "Bluesky Analysis",
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (err) {
+        console.error("Sharing failed:", err);
+      }
+    } else {
+      // フォールバック：Bluesky共有画面を新しいタブで開く
+      const intentUrl = `https://bsky.app/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+      window.open(intentUrl, "_blank");
+    }
+  };
 </script>
 
 {#if error}
   <p style="color: red;">{error}</p>
 {:else if resultAnalyze}
   <div class="p-8 bg-gray-100 space-y-4">
-    <h2 class="text-2xl font-bold mb-6 text-gray-700">Result Analyze for {handle}</h2>
+    <!-- タイトルとシェアボタン -->
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-700">Result Analyze for {handle}</h2>
+      <!-- シェアボタン -->
+      <button
+        on:click={shareResult}
+        aria-label="Share"
+        class="text-2xl p-2 rounded-full hover:bg-primary-900"
+      >
+        <IcSharpShare />
+      </button>
+    </div>
 
     <!-- Profile -->
     <Profile
@@ -75,10 +112,10 @@
         {
           title: 'Average Interval',
           content: resultAnalyze.activity.all.averageInterval,
-          percentile: percentiles.averageInterval,
+          percentile: percentiles?.averageInterval,
         },
         {
-          title: 'Last Action Time',
+          title: 'Last Activity',
           content: resultAnalyze.activity.all.lastAt,
         },
       ]} />
@@ -97,12 +134,12 @@
           { 
             title: 'Avg Interval',
             content: resultAnalyze.activity.post.averageInterval,
-            percentile: percentiles.averagePostsInterval,
+            percentile: percentiles?.averagePostsInterval,
           },
           {
             title: 'Avg Text Length',
             content: resultAnalyze.activity.post.averageLength,
-            percentile: percentiles.averageTextLength,
+            percentile: percentiles?.averageTextLength,
             percentileDesc: true,
           },
         ]}
@@ -126,7 +163,7 @@
           {
             title: 'Avg Interval',
             content: resultAnalyze.activity.like.averageInterval,
-            percentile: percentiles.averageLikeInterval,
+            percentile: percentiles?.averageLikeInterval,
           },
           {
             title: 'Last Activity',
@@ -144,7 +181,7 @@
           {
             title: 'Avg Interval',
             content: resultAnalyze.activity.repost.averageInterval,
-            percentile: percentiles.averageRepostInterval,
+            percentile: percentiles?.averageRepostInterval,
           },
           {
             title: 'Last Activity',

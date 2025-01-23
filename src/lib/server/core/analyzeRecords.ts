@@ -108,7 +108,7 @@ async function getRecentFriends(handle: string, posts: App.RecordExt[], likes: A
   recentFriends = aggregateRecentFriends(didLike, recentFriends, SCORE_LIKE);
 
   // 自分を除外
-  const recentFriendsFiltered = recentFriends.filter(friend => friend.displayName !== handle );
+  const recentFriendsFiltered = recentFriends.filter(friend => friend.handle !== handle );
 
   // getProfilesが25までなのでslice
   const recentFriendsSorted = sortRecentFriendsByScore(recentFriendsFiltered);

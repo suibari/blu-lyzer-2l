@@ -79,9 +79,19 @@
   });
 
   function calculateInfluencer(followsCount: number, followersCount: number): number {
-    const infuence = Math.log10((followersCount / followsCount) * 1000) * 30 - 50;
-    return (infuence > 100) ? 100 : infuence;
+  if (followsCount === 0) {
+    return followersCount > 0 ? 100 : 0; // フォローが0のときの特例処理
   }
+
+  // フォロワー数とフォロー数の比率を計算
+  const ratio = followersCount / followsCount;
+
+  // スコアを50を基準にして計算し、倍率に応じて値を調整
+  const influence = 50 + (Math.log10(ratio) * 25);
+
+  // 最小0、最大100に制限
+  return Math.min(Math.max(influence, 0), 100);
+}
 
   /**
    * Morning Person スコアを計算する関数

@@ -1,18 +1,10 @@
 import { PUBLIC_NODE_ENV } from '$env/static/public';
 import SessionManager from '$lib/server/bluesky/sessionManager';
 import { transformAppToDb, transformDbToApp } from '$lib/server/core/transformType';
-import { getRecordsAndAnalyze, upsertRecords } from '$lib/server/inngest';
+import { getRecordsAndAnalyze, upsertRecords } from '$lib/server/inngest/functions';
 import { supabase } from '$lib/server/supabase';
 import type { RequestHandler } from '@sveltejs/kit';
 import { inngest } from '$lib/server/inngest';
-
-const propertyNames = [
-  "averageInterval",
-  "averagePostsInterval",
-  "averageLikeInterval",
-  "averageRepostInterval",
-  "averageTextLength",
-];
 
 const sessionManager = SessionManager.getInstance();
 
@@ -22,6 +14,8 @@ export const GET: RequestHandler = async ({ params }) => {
   if (!handle) {
     return new Response(JSON.stringify({ error: 'Invalid Handle' }), { status: 400 });
   }
+
+  console.log(`[INFO] receive handle: ${handle}`);
 
   try {
     await sessionManager.createOrRefreshSession();
@@ -37,14 +31,13 @@ export const GET: RequestHandler = async ({ params }) => {
     // 既存ユーザ or 新規ユーザ
     const { data } = await supabase
       .from("records")
-      .select('result_analyze, updated_at')
+      .select('result_analyze, percentiles, updated_at')
       .eq('handle', handle)
       .single();
 
     if (data) {
       // DBに存在: 既存ユーザ
       const resultAnalyze = transformDbToApp(data.result_analyze, data.updated_at);
-      const percentiles = await getPercentilesForProperties(handle, propertyNames);
 
       // バックグラウンド処理
       if (isUpdatedWithinAnHour(data.updated_at) && PUBLIC_NODE_ENV !== "development") {
@@ -53,16 +46,15 @@ export const GET: RequestHandler = async ({ params }) => {
         await inngest.send({ name: "analyze/existing-user", data: { handle } });
       }
 
-      return new Response(JSON.stringify({ resultAnalyze, percentiles, profile }), { status: 200 });
+      return new Response(JSON.stringify({ resultAnalyze, percentiles: data.percentiles, profile }), { status: 200 });
     } else {
       // DBに存在しない: 新規ユーザ
       const newResultAnalyze = await getRecordsAndAnalyze(handle, 100);
-      const percentiles = await getPercentilesForProperties(handle, propertyNames);
 
       // バックグラウンド処理
       await inngest.send({ name: "analyze/new-user", data: { handle, newResultAnalyze } });
 
-      return new Response(JSON.stringify({ resultAnalyze: newResultAnalyze, percentiles, profile }), { status: 200 });
+      return new Response(JSON.stringify({ resultAnalyze: newResultAnalyze, percentiles: null, profile }), { status: 200 });
     }
 
   } catch (err: any) {
@@ -82,36 +74,4 @@ function isUpdatedWithinAnHour(updatedAt: string | Date): boolean {
   const updatedTimeUTC = new Date(updatedAt).getTime(); // UTCタイムスタンプ
   const oneHourAgo = Date.now() - 60 * 60 * 1000;
   return updatedTimeUTC >= oneHourAgo;
-}
-
-/**
- * 複数のプロパティのパーセンタイルを順次取得
- * @param handle 対象のハンドル
- * @param propertyNames 複数のプロパティ名
- * @returns 各プロパティのパーセンタイルと値を含むオブジェクト
- */
-async function getPercentilesForProperties(handle: string, propertyNames: string[]) {
-  const percentiles: Record<string, { value: number; rank: number } | null> = {};
-
-  // 各プロパティ名について順次RPCを実行
-  for (const propertyName of propertyNames) {
-    const { data, error } = await supabase.rpc('get_json_property_percentile', {
-      target_handle: handle,
-      property_name: propertyName,
-    });
-
-    if (error) {
-      console.error(`Error fetching percentile for property: ${propertyName}`, error);
-      percentiles[propertyName] = null;  // エラーが発生した場合はnullを設定
-      continue;
-    }
-
-    if (data) {
-      percentiles[propertyName] = data;
-    } else {
-      percentiles[propertyName] = null;  // データがなければnullを設定
-    }
-  }
-
-  return percentiles;
 }
