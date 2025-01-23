@@ -2,6 +2,7 @@
   export let title: string;
   export let content: string | number | null;
   export let percentile: number | null = null;
+  export let percentileDesc: boolean | null = false;
 
   // content が ISO 8601 文字列なら日付変換
   let displayContent: string | number | null = content;
@@ -20,7 +21,7 @@
   <div class="text-xl text-gray-600 mt-2">
     {displayContent}
     {#if percentile}
-      <span class="text-gray-500"> (Rank: Top {100 - percentile}%)</span>
+      <span class="text-gray-500"> (Rank: Top {percentileDesc? percentile : (100 - percentile)}%)</span>
     {/if}
   </div>
 </div>

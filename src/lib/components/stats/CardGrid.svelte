@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let cards: Array<{ title: string; content: string | number | null; percentile?: number | null }>;
+  export let cards: Array<{ title: string; content: string | number | null; percentile?: number | null; percentileDesc?: boolean | null; }>;
   import Card from './Card.svelte';
 </script>
 

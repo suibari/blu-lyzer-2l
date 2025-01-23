@@ -5,10 +5,13 @@
   import CardGrid from '$lib/components/stats/CardGrid.svelte';
   import LineGraph from '$lib/components/stats/LineGraph.svelte';
   import BarGraph from '$lib/components/stats/BarGraph.svelte';
+  import Profile from '$lib/components/stats/Profile.svelte';
+  import type { AppBskyActorProfile } from '@atproto/api';
 
   let handle: string;
   let resultAnalyze: App.ResultAnalyze;
   let percentiles: App.Percentiles;
+  let profile: AppBskyActorProfile.Record;
   let error: string | null = null;
 
   // ------------------------
@@ -23,8 +26,10 @@
         const data = await res.json();
         resultAnalyze = data.resultAnalyze;
         percentiles = data.percentiles;
+        profile = data.profile;
       } else {
-        error = `Error fetching data: ${res.statusText}`;
+        const errorData = await res.json();  // エラーメッセージを取得
+        error = `Error fetching data: ${errorData.message || errorData.error || 'Unknown error'}`;
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -39,6 +44,13 @@
 {:else if resultAnalyze}
   <div class="p-8 bg-gray-100 space-y-4">
     <h2 class="text-2xl font-bold mb-6 text-gray-700">Result Analyze for {handle}</h2>
+
+    <!-- Profile -->
+    <Profile
+      {profile}
+      {resultAnalyze}
+      {percentiles}
+    />
 
     <!-- Recent Friends -->
     <div>
@@ -91,6 +103,7 @@
             title: 'Avg Text Length',
             content: resultAnalyze.activity.post.averageLength,
             percentile: percentiles.averageTextLength,
+            percentileDesc: true,
           },
         ]}
       />

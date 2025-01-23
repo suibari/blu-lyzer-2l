@@ -31,6 +31,7 @@ const doAnalyzeAndUpsertNewUser = inngest.createFunction(
 export async function getRecordsAndAnalyze (handle: string): Promise<App.ResultAnalyze> {
   const records = await getLatestRecords(handle);
   const resultAnalyze = await analyzeRecords(records);
+  console.log(resultAnalyze)
   console.log(`[INFO] get result_analyze: ${handle}`);
   return resultAnalyze;
 }
