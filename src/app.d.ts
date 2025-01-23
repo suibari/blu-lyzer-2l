@@ -10,6 +10,7 @@ declare global {
 		}
 		
 		interface RecordValue {
+      langs?: string[];
 			$type: string,
 			createdAt: string,
 			text?: string,

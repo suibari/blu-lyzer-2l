@@ -1,6 +1,7 @@
-import type { Record } from '@atproto/api/dist/client/types/com/atproto/repo/listRecords';
 import { getNounFrequencies } from "./getNounFrequencies";
 import SessionManager from '../bluesky/sessionManager';
+import { getWordFrequencyEn } from "./getWordFrequencyEn";
+import { analyzePosts } from "./analyzePosts";
 
 const SCORE_REPLY = 10;
 const SCORE_LIKE = 1;
@@ -17,7 +18,7 @@ export async function analyzeRecords(did: string, records: RecordMap): Promise<A
   const allRecords = collectAllRecords(records);
 
   // 頻出単語分析
-  const { wordFreqMap, sentimentHeatmap } = await getNounFrequencies(records.posts);
+  const { wordFreqMap, sentimentHeatmap } = await analyzePosts(records.posts);
 
   return {
     activity: {

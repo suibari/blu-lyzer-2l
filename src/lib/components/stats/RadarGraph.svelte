@@ -137,7 +137,7 @@
     }
 
     const sentimentSum = sentimentHeatmap.reduce((acc, curr) => acc + curr, 0);
-    const sentimentSumConv =  Math.round(sentimentSum * 100);
+    const sentimentSumConv =  sentimentSum * 100 + 50;
 
     return (sentimentSumConv > 100) ? 100 : (sentimentSumConv < 0) ? 0 : sentimentSumConv;
   }

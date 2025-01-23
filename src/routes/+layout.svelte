@@ -1,7 +1,13 @@
-<script>
+<script lang="ts">
   import Footer from "$lib/components/Footer.svelte";
+    import About from "$lib/components/modals/About.svelte";
+    import ChangeLog from "$lib/components/modals/ChangeLog.svelte";
   import "../app.css";
   import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, FooterIcon } from 'flowbite-svelte';
+
+  let aboutModal = false;
+  let disclaimerModal = false;
+  let changeLogModal = false;
 </script>
 
 <div class="flex flex-col min-h-screen">
@@ -11,9 +17,9 @@
     </NavBrand>
     <NavHamburger />
     <NavUl>
-      <NavLi class="md:text-gray-100 sm:text-primary-900">About</NavLi>
-      <NavLi class="md:text-gray-100 sm:text-primary-900">Disclaimer</NavLi>
-      <NavLi class="md:text-gray-100 sm:text-primary-900">ChangeLog</NavLi>
+      <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => aboutModal = true}>About</NavLi>
+      <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => disclaimerModal = true}>Disclaimer</NavLi>
+      <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => changeLogModal = true}>ChangeLog</NavLi>
     </NavUl>
   </Navbar>
   
@@ -23,3 +29,6 @@
   
   <Footer />  
 </div>
+
+<About bind:aboutModal />
+<ChangeLog bind:changeLogModal />

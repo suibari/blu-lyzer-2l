@@ -8,6 +8,7 @@
   import Profile from '$lib/components/stats/Profile.svelte';
   import type { AppBskyActorProfile } from '@atproto/api';
   import IcSharpShare from '$lib/components/icons/IcSharpShare.svelte';
+  import { Spinner } from 'flowbite-svelte';
 
   let handle: string;
   let resultAnalyze: App.ResultAnalyze;
@@ -144,7 +145,7 @@
         ]}
       />
       
-      {#if resultAnalyze.activity.post.wordFreqMap}
+      {#if resultAnalyze.activity.post.wordFreqMap && resultAnalyze.activity.post.wordFreqMap.length > 0}
         <CardWide 
           title="Word Frequencies" 
           items={resultAnalyze.activity.post.wordFreqMap.map(word => ({ label: word.noun, value: word.count }))} 
@@ -196,7 +197,8 @@
     </div>
   </div>
 
-
 {:else}
-  <p class="text-center justify-center">Loading...</p>
+  <div class="flex items-center justify-center w-full min-h-[calc(100vh-150px)]">
+    <Spinner color="blue" size={12} class="text-center" />
+  </div>
 {/if}

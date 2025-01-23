@@ -30,11 +30,11 @@
       type="text"
       placeholder="Enter your Bluesky handle"
       bind:value={handle}
-      class="w-3/4 md:w-1/2 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+      class="w-3/4 md:w-1/2 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition ml-4"
     />
     <button 
       type="submit" 
-      class="px-4 py-2 bg-primary-800 text-white rounded-lg hover:bg-primary-700 transition">
+      class="px-4 py-2 bg-primary-800 text-white rounded-lg hover:bg-primary-700 transition mr-4">
       Analyze
     </button>
   </form>
