@@ -1,4 +1,4 @@
-import SessionManager from './sessionManager';
+import { AtpAgent } from '@atproto/api';
 
 export type RecordMap = {
   posts: App.RecordExt[];
@@ -6,7 +6,7 @@ export type RecordMap = {
   repost: App.RecordExt[];
 };
 
-const sessionManager = SessionManager.getInstance();
+const agent = new AtpAgent({ service: 'https://bsky.network' });
 
 /**
  * Get the latest posts, likes, and reposts for a given handle
@@ -14,9 +14,6 @@ const sessionManager = SessionManager.getInstance();
  * @returns Promise<RecordMap> Containing posts, likes, and reposts
  */
 export async function getLatestRecords(handle: string, limit: number): Promise<RecordMap> {
-  await sessionManager.createOrRefreshSession();
-
-  const agent = sessionManager.getAgent();
 
   const fetchRecords = async (collection: string, limit: number): Promise<App.RecordExt[]> => {
     try {
