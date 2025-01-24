@@ -13,7 +13,7 @@ export const propertyNames = [
 ];
 
 export async function getRecordsAndAnalyze (handle: string, did: string, limit: number): Promise<App.ResultAnalyze> {
-  const records = await getLatestRecords(handle, limit);
+  const records = await getLatestRecords(handle, did, limit);
   const resultAnalyze = await analyzeRecords(did, records);
   console.log(`[INFO][INNGEST] get result_analyze: ${handle}`);
   return resultAnalyze;

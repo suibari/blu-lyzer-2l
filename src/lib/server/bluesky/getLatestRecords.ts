@@ -1,4 +1,5 @@
 import { AtpAgent } from '@atproto/api';
+import { getPdsDomain } from './getPdsDomain';
 
 export type RecordMap = {
   posts: App.RecordExt[];
@@ -6,14 +7,15 @@ export type RecordMap = {
   repost: App.RecordExt[];
 };
 
-const agent = new AtpAgent({ service: 'https://bsky.network' });
-
 /**
  * Get the latest posts, likes, and reposts for a given handle
  * @param handle The Bluesky handle of the user
  * @returns Promise<RecordMap> Containing posts, likes, and reposts
  */
-export async function getLatestRecords(handle: string, limit: number): Promise<RecordMap> {
+export async function getLatestRecords(handle: string, did: string, limit: number): Promise<RecordMap> {
+
+  const pds = await getPdsDomain(did);
+  const agent = new AtpAgent({ service: pds });
 
   const fetchRecords = async (collection: string, limit: number): Promise<App.RecordExt[]> => {
     try {
