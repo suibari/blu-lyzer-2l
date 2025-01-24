@@ -110,11 +110,13 @@
       <h3 class="text-xl font-semibold text-gray-800 mb-4">All Activity</h3>
       <CardGrid cards={[
         {
+          type: "interval",
           title: 'Average Interval',
           content: resultAnalyze.activity.all.averageInterval,
           percentile: percentiles?.averageInterval,
         },
         {
+          type: "date",
           title: 'Last Activity',
           content: resultAnalyze.activity.all.lastAt,
         },
@@ -132,11 +134,13 @@
       <CardGrid
         cards={[
           { 
+            type: "interval",
             title: 'Avg Interval',
             content: resultAnalyze.activity.post.averageInterval,
             percentile: percentiles?.averagePostsInterval,
           },
           {
+            type: "length",
             title: 'Avg Text Length',
             content: resultAnalyze.activity.post.averageLength,
             percentile: percentiles?.averageTextLength,
@@ -161,11 +165,13 @@
       <CardGrid
         cards={[
           {
+            type: "interval",
             title: 'Avg Interval',
             content: resultAnalyze.activity.like.averageInterval,
             percentile: percentiles?.averageLikeInterval,
           },
           {
+            type: "date",
             title: 'Last Activity',
             content: resultAnalyze.activity.like.lastAt
           },
@@ -179,11 +185,13 @@
       <CardGrid
         cards={[
           {
+            type: "interval",
             title: 'Avg Interval',
             content: resultAnalyze.activity.repost.averageInterval,
             percentile: percentiles?.averageRepostInterval,
           },
           {
+            type: "date",
             title: 'Last Activity',
             content: resultAnalyze.activity.repost.lastAt
           },

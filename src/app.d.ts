@@ -97,5 +97,7 @@ declare global {
 			averageLikeInterval?: number;
 			averageRepostInterval?: number;
 		}
+
+		export type CardType = "interval" | "length" | "date";
 	}
 }
