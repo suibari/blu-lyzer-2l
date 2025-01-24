@@ -10,7 +10,7 @@ export default class SessionManager {
   private password: string;
 
   constructor() {
-    this.agent = new AtpAgent({ service: 'https://bsky.network' });
+    this.agent = new AtpAgent({ service: 'https://bsky.social' });
     this.identifier = BSKY_IDENTIFIER;
     this.password = BSKY_APP_PASSWORD;
   }
