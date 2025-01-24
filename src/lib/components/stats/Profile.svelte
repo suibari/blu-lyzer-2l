@@ -13,7 +13,7 @@
     <!-- Avatar and DisplayName -->
     <div class="flex items-center mb-4">
       <img src={String(profile.avatar)} alt="Avatar" class="w-16 h-16 rounded-full border-2 border-gray-300 mr-4" />
-      <h2 class="text-2xl font-semibold text-gray-800">{profile.displayName}</h2>
+      <h2 class="text-2xl font-semibold text-gray-800">{profile.displayName? profile.displayName : profile.handle}</h2>
     </div>
 
     <!-- Profile Description -->
@@ -23,12 +23,14 @@
   <!-- Right side: Radar Chart -->
   <div class="w-full md:w-1/2 mt-4 md:mt-0 md:pl-8">
     <div class="w-full h-full border border-gray-300 rounded-lg">
-      <RadarGraph
-        {profile}
-        activityHeatmap={resultAnalyze.activity.all.actionHeatmap}
-        sentimentHeatmap={resultAnalyze.activity.post.sentimentHeatmap}
-        {percentiles}
-      />
+      {#if profile && resultAnalyze && percentiles}
+        <RadarGraph
+          {profile}
+          activityHeatmap={resultAnalyze.activity.all.actionHeatmap}
+          sentimentHeatmap={resultAnalyze.activity.post.sentimentHeatmap}
+          {percentiles}
+        />  
+      {/if}
     </div>
   </div>
 </div>

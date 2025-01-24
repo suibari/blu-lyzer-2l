@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let cards: Array<{ title: string; content: string | number | null; percentile?: number | null; percentileDesc?: boolean | null; }>;
+  export let cards: Array<{ type: App.CardType; title: string; content: string | number | null; percentile?: number | null; percentileDesc?: boolean | null; }>;
   import Card from './Card.svelte';
 </script>
 
@@ -8,6 +8,7 @@
     {#if card.content}
       <!-- デフォルト値を展開時に設定 -->
       <Card 
+        type={card.type}
         title={card.title} 
         content={card.content} 
         percentile={card.percentile ?? null} 

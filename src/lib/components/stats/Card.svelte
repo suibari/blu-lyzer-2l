@@ -4,22 +4,28 @@
   export let percentile: number | null = null;
   export let percentileDesc: boolean = false;
 
-  // content が ISO 8601 文字列なら日付変換
+  // typeの定義
+  export let type: App.CardType; // "interval", "length", "date" のみに制限
+
   let displayContent: string | number | null = content;
 
-  if (typeof content === "string") {
+  // typeに基づいてdisplayContentを決定
+  if (type === "date" && typeof content === "string") {
     const date = new Date(content);
     if (!isNaN(date.getTime())) {
-      // ISO 文字列と認識された場合、ローカルの日付形式に変換
+      // ISO文字列と認識された場合、ローカルの日付形式に変換
       displayContent = date.toLocaleString();
     }
-  } else if (typeof content === "number") {
+  } else if (type === "interval" && typeof content === "number") {
     // 数値なのでAverage Interval系と判定
     const avgValue = Math.round((content / 60) * 100) / 100;
-    displayContent = `${avgValue} [min]`
+    displayContent = `${avgValue} [min]`;
+  } else if (type === "length" && typeof content === "number") {
+    // "length"タイプならそのまま数値として表示
+    displayContent = `${Math.round(content * 100) / 100}`;
   }
 
-  function fixPercentile(percentile: number, desc: boolean):number {
+  function fixPercentile(percentile: number, desc: boolean): number {
     if (desc) {
       return Math.round(percentile * 100) / 100;
     } else {
