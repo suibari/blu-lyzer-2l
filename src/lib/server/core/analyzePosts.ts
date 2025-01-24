@@ -5,43 +5,12 @@ export async function analyzePosts(posts: App.RecordExt[]) {
   const combinedWordFreqMap: Record<string, App.wordFreq> = {};
   const sentimentHeatmap = new Array(24).fill(0);
 
-  // jaとその他の言語に分ける
-  const jaPosts: App.RecordExt[] = [];
-  const otherPosts: App.RecordExt[] = [];
+  // jaポストが一つでも含まれているか確認
+  const hasJaPost = posts.some(post => post.value.langs && post.value.langs.length === 1 && post.value.langs[0] === "ja");
 
-  for (const post of posts) {
-    const langs = post.value.langs;
-
-    if (langs && langs.length === 1 && langs[0] === "ja") {
-      jaPosts.push(post);
-    } else {
-      otherPosts.push(post);
-    }
-  }
-
-  // 1. ja以外の投稿を先に処理
-  for (const post of otherPosts) {
-    const { wordFreqMap, sentimentHeatmap: enHeatmap } = await getWordFrequencyEn([post]);
-
-    // wordFreqMapのマージ
-    wordFreqMap.forEach(({ noun, count, sentimentScoreSum }) => {
-      if (!combinedWordFreqMap[noun]) {
-        combinedWordFreqMap[noun] = { noun, count, sentimentScoreSum };
-      } else {
-        combinedWordFreqMap[noun].count += count;
-        combinedWordFreqMap[noun].sentimentScoreSum += sentimentScoreSum;
-      }
-    });
-
-    // sentimentHeatmapの加算
-    enHeatmap.forEach((value, index) => {
-      sentimentHeatmap[index] += value;
-    });
-  }
-
-  // 2. jaの投稿をまとめて処理
-  if (jaPosts.length > 0) {
-    const { wordFreqMap, sentimentHeatmap: jaHeatmap } = await getNounFrequencies(jaPosts);
+  if (hasJaPost) {
+    // 日本語ポストが含まれている場合はgetNounFrequenciesを使う
+    const { wordFreqMap, sentimentHeatmap: jaHeatmap } = await getNounFrequencies(posts);
 
     // wordFreqMapのマージ
     wordFreqMap.forEach(({ noun, count, sentimentScoreSum }) => {
@@ -55,6 +24,24 @@ export async function analyzePosts(posts: App.RecordExt[]) {
 
     // sentimentHeatmapの加算
     jaHeatmap.forEach((value, index) => {
+      sentimentHeatmap[index] += value;
+    });
+  } else {
+    // 日本語ポストが含まれていない場合はgetWordFrequencyEnを使う
+    const { wordFreqMap, sentimentHeatmap: enHeatmap } = await getWordFrequencyEn(posts);
+
+    // wordFreqMapのマージ
+    wordFreqMap.forEach(({ noun, count, sentimentScoreSum }) => {
+      if (!combinedWordFreqMap[noun]) {
+        combinedWordFreqMap[noun] = { noun, count, sentimentScoreSum };
+      } else {
+        combinedWordFreqMap[noun].count += count;
+        combinedWordFreqMap[noun].sentimentScoreSum += sentimentScoreSum;
+      }
+    });
+
+    // sentimentHeatmapの加算
+    enHeatmap.forEach((value, index) => {
       sentimentHeatmap[index] += value;
     });
   }

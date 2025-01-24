@@ -19,7 +19,7 @@ export async function getRecordsAndAnalyze (handle: string, did: string, limit: 
   return resultAnalyze;
 }
 
-export async function upsertRecords (handle: string, resultAnalyze: App.ResultAnalyze, percentiles: Record<string, { value: number } | null>) {
+export async function upsertRecords (handle: string, resultAnalyze: App.ResultAnalyze, percentiles: Record<string, { value: number } | null> | null) {
   await supabase
     .from("records")
     .upsert([{

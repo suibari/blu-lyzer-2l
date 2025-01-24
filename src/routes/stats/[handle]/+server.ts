@@ -1,7 +1,7 @@
 import { PUBLIC_NODE_ENV } from '$env/static/public';
 import SessionManager from '$lib/server/bluesky/sessionManager';
 import { transformAppToDb, transformDbToApp } from '$lib/server/core/transformType';
-import { getRecordsAndAnalyze, upsertRecords } from '$lib/server/inngest/functions';
+import { getPercentilesForProperties, getRecordsAndAnalyze, propertyNames, upsertRecords } from '$lib/server/inngest/functions';
 import { supabase } from '$lib/server/supabase';
 import type { RequestHandler } from '@sveltejs/kit';
 import { inngest } from '$lib/server/inngest';
@@ -38,7 +38,13 @@ export const GET: RequestHandler = async ({ params }) => {
 
     if (data) {
       // DBに存在: 既存ユーザ
+      console.log(`[INFO] existing user: ${handle}`);
       const resultAnalyze = transformDbToApp(data.result_analyze, data.updated_at);
+
+      // percentileがなかったら、反映まで2回更新が必要なのでここで表示させる
+      if (!data.percentiles) {
+        data.percentiles = await doTmpUpsertAndGetPercentile(handle, did);
+      }
 
       // バックグラウンド処理
       if (isUpdatedWithinAnHour(data.updated_at) && PUBLIC_NODE_ENV !== "development") {
@@ -50,12 +56,16 @@ export const GET: RequestHandler = async ({ params }) => {
       return new Response(JSON.stringify({ resultAnalyze, percentiles: data.percentiles, profile }), { status: 200 });
     } else {
       // DBに存在しない: 新規ユーザ
+      console.log(`[INFO] new user! : ${handle}`);
       const newResultAnalyze = await getRecordsAndAnalyze(handle, did, 100);
+
+      // percentileがないのは見栄えが悪いので時間がかかっても取得
+      const percentiles = await doTmpUpsertAndGetPercentile(handle, did);
 
       // バックグラウンド処理
       await inngest.send({ name: "analyze/new-user", data: { handle, newResultAnalyze } });
 
-      return new Response(JSON.stringify({ resultAnalyze: newResultAnalyze, percentiles: null, profile }), { status: 200 });
+      return new Response(JSON.stringify({ resultAnalyze: newResultAnalyze, percentiles, profile }), { status: 200 });
     }
 
   } catch (err: any) {
@@ -75,4 +85,12 @@ function isUpdatedWithinAnHour(updatedAt: string | Date): boolean {
   const updatedTimeUTC = new Date(updatedAt).getTime(); // UTCタイムスタンプ
   const oneHourAgo = Date.now() - 60 * 60 * 1000;
   return updatedTimeUTC >= oneHourAgo;
+}
+
+async function doTmpUpsertAndGetPercentile(handle: string, did: string) {
+  const tmpResultAnalyze = await getRecordsAndAnalyze(handle, did, 100);
+  await upsertRecords(handle, tmpResultAnalyze, null);
+  const percentiles = await getPercentilesForProperties(handle, propertyNames);
+
+  return percentiles;
 }
