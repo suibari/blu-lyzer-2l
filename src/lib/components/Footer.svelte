@@ -6,7 +6,7 @@
   <div class="container mx-auto flex justify-between items-center">
     <p class="text-sm">&copy; 2025 Blu-lyzer</p>
     <a 
-      href="https://github.com/your-repo" 
+      href="https://github.com/suibari/blu-lyzer-2l" 
       target="_blank" 
       rel="noopener noreferrer" 
       class="hover:opacity-80 transition-opacity"

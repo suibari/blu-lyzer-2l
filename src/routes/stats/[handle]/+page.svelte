@@ -98,13 +98,8 @@
       <CardWide
         id="recentfriends"
         title="Recent Friends"
-        items={resultAnalyze.relationship.map((friend) => ({
-          label: friend.displayName || '',
-          img: friend.avator,
-          handle: friend.handle,
-          replies: friend.replyCount,
-          likes: friend.likeCount
-        }))}
+        recentFriends={resultAnalyze.relationship}
+        wordFreqMap={undefined}
       />
     </div>
 
@@ -157,8 +152,9 @@
       {#if resultAnalyze.activity.post.wordFreqMap && resultAnalyze.activity.post.wordFreqMap.length > 0}
         <CardWide
           id="wordfreq"
-          title="Word Frequencies" 
-          items={resultAnalyze.activity.post.wordFreqMap.map(word => ({ label: word.noun, value: word.count }))} 
+          title="Word Frequencies"
+          recentFriends={undefined}
+          wordFreqMap={resultAnalyze.activity.post.wordFreqMap}
         />
       {/if}
       
