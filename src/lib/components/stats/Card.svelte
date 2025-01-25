@@ -27,11 +27,7 @@
   }
 
   function fixPercentile(percentile: number, desc: boolean): number {
-    if (desc) {
-      return Math.round(percentile * 100) / 100;
-    } else {
-      return Math.round((100 - percentile) * 100) / 100;
-    }
+    return Math.round(percentile * 100) / 100;
   }
 </script>
 
