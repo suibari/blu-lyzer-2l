@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { changelog } from './modals/config/changelog';
-  import Autocomplete from './top/Autocomplete.svelte';
+  import { changelog } from '../modals/config/changelog'; 
+  import Autocomplete from './Autocomplete.svelte';
 </script>
 
 <div class="container flex flex-col justify-center items-center h-full fixed inset-0 text-center text-primary-800">
