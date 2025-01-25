@@ -11,7 +11,7 @@
 </script>
 
 <div class="flex flex-col min-h-screen">
-  <Navbar class="text-gray-100 bg-primary-900">
+  <Navbar class="text-gray-100 bg-primary-900 z-20">
     <NavBrand href="/">
       <span class="font-orbitron text-2xl ml-2">Blu-lyzer</span>
     </NavBrand>

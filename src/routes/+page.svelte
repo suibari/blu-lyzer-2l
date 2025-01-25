@@ -1,5 +1,5 @@
 <script>
-  import Welcome from "$lib/components/Welcome.svelte";
+  import Welcome from "$lib/components/top/Welcome.svelte";
 </script>
 
-<Welcome LATEST_VER="0.3.0" />
+<Welcome />
