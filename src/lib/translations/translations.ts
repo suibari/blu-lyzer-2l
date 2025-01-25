@@ -5,9 +5,23 @@ const config = ({
   loaders: [
     {
       locale: 'en',
+      key: 'top',
+      loader: async () => (
+        await import('./en/top.json')
+      ).default,
+    },
+    {
+      locale: 'en',
       key: 'stats',
       loader: async () => (
         await import('./en/stats.json')
+      ).default,
+    },
+    {
+      locale: 'ja',
+      key: 'top',
+      loader: async () => (
+        await import('./ja/top.json')
       ).default,
     },
     {

@@ -72,7 +72,7 @@
       fetchSuggestions(query);
       selectedIndex = -1;
     }}
-    placeholder="Type a username..."
+    placeholder="Type a Bluesky handle..."
     class="w-full p-3 border border-gray-300 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
   />
 

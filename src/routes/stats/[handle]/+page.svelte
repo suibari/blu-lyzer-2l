@@ -10,6 +10,7 @@
   import IcSharpShare from '$lib/components/icons/IcSharpShare.svelte';
   import { Spinner } from 'flowbite-svelte';
   import { shiftHeatmapInResultAnalyze } from '$lib/components/stats/shiftHeatmapByTimezone';
+  import { t } from '$lib/translations/translations';
 
   let handle: string;
   let resultAnalyze: App.ResultAnalyze;
@@ -45,8 +46,8 @@
   // web share API
   // ------------------------
   const shareResult = async () => {
-    const shareText = `Check out the results for ${handle} on Bluesky Analysis!`;
-    const shareUrl = `https://blu-lyzer.suibari.com/stats/${handle}`;
+    const shareUrl = `https://blu-lyzer.suibari.com/stats/${handle}`
+    const shareText = $t("stats.share_text") + ` ${shareUrl}`;
 
     if (navigator.share) {
       // Web Share API をサポートしている場合
@@ -54,14 +55,14 @@
         await navigator.share({
           title: "Bluesky Analysis",
           text: shareText,
-          url: shareUrl,
+          // url: shareUrl, // URLが優先され、textが無視されることが多い
         });
       } catch (err) {
         console.error("Sharing failed:", err);
       }
     } else {
       // フォールバック：Bluesky共有画面を新しいタブで開く
-      const intentUrl = `https://bsky.app/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+      const intentUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(shareText)}`;
       window.open(intentUrl, "_blank");
     }
   };
