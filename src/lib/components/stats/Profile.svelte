@@ -13,7 +13,7 @@
   <div class="flex flex-col items-start md:w-1/2 sm:w-full">
     <!-- Avatar and DisplayName -->
     <div class="flex items-center mb-4">
-      <a href="https://bsky.app/profile/{profile.handle}">
+      <a href="https://bsky.app/profile/{profile.handle}" target="_blank" >
         <img
           src={String(profile.avatar) || '/avatar.png'}
           alt="Avatar"

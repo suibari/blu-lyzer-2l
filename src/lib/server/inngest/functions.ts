@@ -42,7 +42,9 @@ export async function getPercentilesForProperties(handle: string, propertyNames:
 
   // 各プロパティ名について順次RPCを実行
   for (const propertyName of propertyNames) {
-    const { data, error } = await supabase.rpc('get_json_property_percentile', {
+    const rpcFuncName = (propertyName === "averageTextLength") ? "get_json_property_percentile" : "get_json_property_percentile_asc";
+
+    const { data, error } = await supabase.rpc(rpcFuncName, {
       target_handle: handle,
       property_name: propertyName,
     });

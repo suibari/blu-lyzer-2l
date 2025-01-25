@@ -110,7 +110,7 @@
         {
           id: "avarageAllInterval",
           type: "interval",
-          title: 'Average Interval',
+          title: 'Avg Interval',
           content: resultAnalyze.activity.all.averageInterval,
           percentile: percentiles?.averageInterval,
         },
@@ -145,6 +145,11 @@
             content: resultAnalyze.activity.post.averageLength,
             percentile: percentiles?.averageTextLength,
             percentileDesc: true,
+          },
+          {
+            type: "date",
+            title: 'Last Activity',
+            content: resultAnalyze.activity.post.lastAt,
           },
         ]}
       />

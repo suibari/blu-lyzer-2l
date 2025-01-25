@@ -181,11 +181,11 @@ function sortRecentFriendsByScore(recentFriends: App.RecentFriend[]) {
 
 // Calculate the average interval between posts/likes
 function calculateAverageInterval(records: App.RecordExt[]): number {
-  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Filter last 7 days
-  const recentRecords = records.filter(record => new Date(record.value.createdAt) >= oneWeekAgo);
+  // const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Filter last 7 days
+  // const recentRecords = records.filter(record => new Date(record.value.createdAt) >= oneWeekAgo);
 
   // Sort records by createdAt in ascending order
-  recentRecords.sort(
+  records.sort(
     (a, b) =>
       new Date(a.value.createdAt).getTime() - new Date(b.value.createdAt).getTime()
   );
@@ -193,10 +193,10 @@ function calculateAverageInterval(records: App.RecordExt[]): number {
   let totalInterval = 0;
   let intervalsCount = 0;
 
-  for (let i = 1; i < recentRecords.length; i++) {
+  for (let i = 1; i < records.length; i++) {
     const interval =
-      new Date(recentRecords[i].value.createdAt).getTime() -
-      new Date(recentRecords[i - 1].value.createdAt).getTime();
+      new Date(records[i].value.createdAt).getTime() -
+      new Date(records[i - 1].value.createdAt).getTime();
     totalInterval += interval;
     intervalsCount++;
   }
