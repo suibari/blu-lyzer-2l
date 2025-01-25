@@ -1,0 +1,10 @@
+{
+  "radar_influencer": "インフルエンサー度",
+  "radar_morning_person": "朝型度",
+  "radar_night_owl": "夜型度",
+  "radar_positivity": "ポジティブ度",
+  "radar_posting_freq": "ポスト頻度",
+  "radar_liking_freq": "いいね頻度",
+  "radar_repost_freq": "リポスト頻度",
+  "radar_longpost_freq": "長文投稿度"
+}

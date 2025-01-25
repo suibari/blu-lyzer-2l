@@ -1,12 +1,16 @@
 <script lang="ts">
   import Footer from "$lib/components/Footer.svelte";
-    import About from "$lib/components/modals/About.svelte";
-    import ChangeLog from "$lib/components/modals/ChangeLog.svelte";
+  import About from "$lib/components/modals/About.svelte";
+  import ChangeLog from "$lib/components/modals/ChangeLog.svelte";
   import "../app.css";
   import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, FooterIcon } from 'flowbite-svelte';
+  import { loadTranslations } from '$lib/translations/translations';
 
   let aboutModal = false;
   let changeLogModal = false;
+
+  const defaultLanguage = "en"
+	loadTranslations(defaultLanguage, "/"); 
 </script>
 
 <div class="flex flex-col min-h-screen">

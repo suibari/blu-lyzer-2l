@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { Chart, registerables } from 'chart.js';
-    import { number } from 'zod';
+  import { t } from '$lib/translations/translations';
 
   // Chart.js のモジュールを登録
   Chart.register(...registerables);
@@ -21,14 +21,14 @@
         type: 'radar',
         data: {
           labels: [
-            'Influencer',
-            'Morning Person',
-            'Night Owl',
-            'Positivity',
-            'Posting Freq',
-            'Liking Freq',
-            'Repost Freq',
-            'Long-Post Freq',
+            $t('stats.radar_influencer'),
+            $t('stats.radar_morning_person'),
+            $t('stats.radar_night_owl'),
+            $t('stats.radar_positivity'),
+            $t('stats.radar_posting_freq'),
+            $t('stats.radar_liking_freq'),
+            $t('stats.radar_repost_freq'),
+            $t('stats.radar_longpost_freq'),
           ],
           datasets: [
             {
