@@ -3,7 +3,8 @@
     import RadarGraph from "./RadarGraph.svelte";
 
   export let profile: AppBskyActorProfile.Record;
-  export let resultAnalyze: App.ResultAnalyze;
+  export let activityHeatmap: number[];
+  export let sentimentHeatmap: number[];
   export let percentiles;
 </script>
 
@@ -23,11 +24,11 @@
   <!-- Right side: Radar Chart -->
   <div class="w-full md:w-1/2 mt-4 md:mt-0 md:pl-8">
     <div class="w-full h-full border border-gray-300 rounded-lg">
-      {#if profile && resultAnalyze && percentiles}
+      {#if profile && activityHeatmap && sentimentHeatmap && percentiles}
         <RadarGraph
           {profile}
-          activityHeatmap={resultAnalyze.activity.all.actionHeatmap}
-          sentimentHeatmap={resultAnalyze.activity.post.sentimentHeatmap}
+          {activityHeatmap}
+          {sentimentHeatmap}
           {percentiles}
         />  
       {/if}

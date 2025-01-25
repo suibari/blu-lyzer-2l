@@ -6,14 +6,13 @@
   import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, FooterIcon } from 'flowbite-svelte';
 
   let aboutModal = false;
-  let disclaimerModal = false;
   let changeLogModal = false;
 </script>
 
 <div class="flex flex-col min-h-screen">
   <Navbar class="text-gray-100 bg-primary-900 z-20">
     <NavBrand href="/">
-      <span class="font-orbitron text-2xl ml-2">Blu-lyzer</span>
+      <span class="font-orbitron text-2xl ml-2 text-gray-100">Blu-lyzer</span>
     </NavBrand>
     <NavHamburger />
     <NavUl>

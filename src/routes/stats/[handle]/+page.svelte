@@ -9,6 +9,7 @@
   import type { AppBskyActorProfile } from '@atproto/api';
   import IcSharpShare from '$lib/components/icons/IcSharpShare.svelte';
   import { Spinner } from 'flowbite-svelte';
+  import { shiftHeatmapInResultAnalyze } from '$lib/components/stats/shiftHeatmapByTimezone';
 
   let handle: string;
   let resultAnalyze: App.ResultAnalyze;
@@ -26,7 +27,7 @@
       const res = await fetch(`/stats/${handle}`);
       if (res.ok) {
         const data = await res.json();
-        resultAnalyze = data.resultAnalyze;
+        resultAnalyze = shiftHeatmapInResultAnalyze(data.resultAnalyze); // タイムゾーン変換
         percentiles = data.percentiles;
         profile = data.profile;
       } else {
@@ -86,7 +87,8 @@
     <!-- Profile -->
     <Profile
       {profile}
-      {resultAnalyze}
+      activityHeatmap={resultAnalyze.activity.all.actionHeatmap}
+      sentimentHeatmap={resultAnalyze.activity.post.sentimentHeatmap}
       {percentiles}
     />
 
