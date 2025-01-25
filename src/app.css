@@ -15,6 +15,10 @@ html {
   overflow-y: auto; /* 内部で縦方向スクロール */
 }
 
+a {
+  color: #3994C1;
+}
+
 .font-orbitron {
   font-family: "Orbitron", serif;
   font-optical-sizing: auto;

@@ -18,7 +18,6 @@
     <NavHamburger />
     <NavUl>
       <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => aboutModal = true}>About</NavLi>
-      <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => disclaimerModal = true}>Disclaimer</NavLi>
       <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => changeLogModal = true}>ChangeLog</NavLi>
     </NavUl>
   </Navbar>
