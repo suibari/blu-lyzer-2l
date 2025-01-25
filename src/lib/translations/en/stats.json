@@ -1,4 +1,5 @@
 {
+  "radar_info": "A radar chart showing the user's Bluesky style",
   "radar_influencer": "Influencer",
   "radar_morning_person": "Morning Person",
   "radar_night_owl": "Night Owl",
@@ -6,5 +7,10 @@
   "radar_posting_freq": "Posting Freq",
   "radar_liking_freq": "Liking Freq",
   "radar_repost_freq": "Repost Freq",
-  "radar_longpost_freq": "Long-Post Freq"
+  "radar_longpost_freq": "Long-Post Freq",
+  "recentfriends_info": "Number of replies and likes for the user's friends recently interacted with",
+  "interval_info": "Average time interval of activity. The rank value indicates the percentage of Blu-lyzer users from the top.",
+  "active_heatmap_info": "A heatmap showing when and what kind of activities occur most frequently",
+  "sentiment_heatmap_info": "A heatmap representing emotional trends by hour. Positive values above 0 indicate bright feelings, while negative values below 0 indicate darker emotions.",
+  "wordfreq_info": "Frequently posted words"
 }

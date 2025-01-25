@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { Chart, registerables } from 'chart.js';
   import { t } from '$lib/translations/translations';
+  import { Tooltip, Button } from 'flowbite-svelte';
 
   // Chart.js のモジュールを登録
   Chart.register(...registerables);
@@ -52,10 +53,10 @@
         },
         options: {
           responsive: true,
-          maintainAspectRatio: false,
+          maintainAspectRatio: true,
           plugins: {
             legend: {
-              position: 'top',
+              display: false,
             },
           },
           scales: {
@@ -144,6 +145,8 @@
 
 </script>
 
-<div class="w-full h-64">
+<div class="w-full h-full">
   <canvas id="radarChart"></canvas>
 </div>
+
+<Tooltip triggeredBy="#radarChart">{$t("stats.radar_info")}</Tooltip>

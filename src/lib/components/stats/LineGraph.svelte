@@ -1,6 +1,10 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { Chart } from 'chart.js/auto';
+  import { Tooltip } from 'flowbite-svelte';
+  import IcBaselineInfo from '../icons/IcBaselineInfo.svelte';
+  import { t } from '$lib/translations/translations';
+    import InfoWithTooltip from '../icons/InfoWithTooltip.svelte';
 
   export let data: number[];
   export let centerZero: boolean = false;
@@ -46,7 +50,10 @@
 
 {#if data.find(d => d !== 0)}
   <div class="p-4 bg-white shadow rounded-lg">
-    <h3 class="text-xl font-semibold text-gray-800 mb-4">Sentiment Heatmap</h3>
+    <div class="flex items-center gap-2 mb-4">
+      <h3 class="text-xl font-semibold text-gray-800">Sentiment Heatmap</h3>
+      <InfoWithTooltip id="sentimentHeatmap" key_i18n="stats.sentiment_heatmap_info" />
+    </div>
     <div class="relative w-full h-64"> <!-- 親要素のサイズに合わせる -->
       <canvas id="lineChart"></canvas>
     </div>

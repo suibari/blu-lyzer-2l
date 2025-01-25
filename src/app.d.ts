@@ -99,5 +99,9 @@ declare global {
 		}
 
 		export type CardType = "interval" | "length" | "date";
+
+		interface Locals {
+			userLocale: string;
+		}
 	}
 }

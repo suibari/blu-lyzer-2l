@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { Chart } from 'chart.js/auto';
+  import InfoWithTooltip from '../icons/InfoWithTooltip.svelte';
 
   export let postData: number[];  // Post に関するデータ
   export let likeData: number[];  // Like に関するデータ
@@ -62,7 +63,10 @@
 </script>
 
 <div class="p-4 bg-white shadow rounded-lg">
-  <h3 class="text-xl font-semibold text-gray-800 mb-4">Active Heatmap</h3>
+  <div class="flex items-center gap-2 mb-4">
+    <h3 class="text-xl font-semibold text-gray-800">Active Heatmap</h3>
+    <InfoWithTooltip id="activeHeatmap" key_i18n="stats.active_heatmap_info" />
+  </div>
   <div class="relative w-full h-64">
     <canvas id="barChart"></canvas>
   </div>

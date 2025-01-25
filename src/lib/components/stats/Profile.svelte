@@ -10,7 +10,7 @@
 
 <div class="w-full mx-auto p-6 bg-white shadow-lg rounded-lg flex flex-col md:flex-row">
   <!-- Left side: Profile -->
-  <div class="flex flex-col items-start md:w-1/2 sm:w-full">
+  <div class="flex flex-col items-start md:w-1/2 sm:w-full max-w-3/4">
     <!-- Avatar and DisplayName -->
     <div class="flex items-center mb-4">
       <img src={String(profile.avatar)} alt="Avatar" class="w-16 h-16 rounded-full border-2 border-gray-300 mr-4" />

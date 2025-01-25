@@ -1,5 +1,8 @@
 <script lang="ts">
+  import InfoWithTooltip from "../icons/InfoWithTooltip.svelte";
+
   export let title: string;
+  export let id: string;
   export let items: Array<{
     img?: string;
     label: string;
@@ -11,7 +14,10 @@
 </script>
 
 <div class="p-4 bg-white shadow rounded-lg">
-  <h3 class="text-xl font-semibold text-gray-800 mb-4">{title}</h3>
+  <div class="flex items-center gap-2 mb-4">
+    <h3 class="text-xl font-semibold text-gray-800">{title}</h3>
+    <InfoWithTooltip {id} key_i18n={`stats.${id}_info`} />
+  </div>
   <div class="flex gap-4 overflow-x-auto">
     {#each items as item}
       <div class="flex flex-col items-center bg-gray-100 p-4 rounded-lg shadow-sm min-w-[150px]">

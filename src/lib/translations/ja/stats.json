@@ -1,4 +1,5 @@
 {
+  "radar_info": "ユーザのBlueskyスタイルを示すレーダーチャート",
   "radar_influencer": "インフルエンサー度",
   "radar_morning_person": "朝型度",
   "radar_night_owl": "夜型度",
@@ -6,5 +7,10 @@
   "radar_posting_freq": "ポスト頻度",
   "radar_liking_freq": "いいね頻度",
   "radar_repost_freq": "リポスト頻度",
-  "radar_longpost_freq": "長文投稿度"
+  "radar_longpost_freq": "長文投稿度",
+  "recentfriends_info": "最近交流のあった友達へのリプライ数といいね数",
+  "interval_info": "活動の時間間隔の平均。Rankの数値はBlu-lyzerユーザの上位から何パーセントかを意味する",
+  "active_heatmap_info": "何時にどのような活動が多いかのヒートマップ",
+  "sentiment_heatmap_info": "何時にどのような感情のことが多いかを表すヒートマップ。0を基準としてプラスが大きいほど明るい気持ちで、マイナスが大きいほど暗い気持ちを意味する",
+  "wordfreq_info": "よくポストする言葉"
 }

@@ -72,8 +72,8 @@
 {:else if resultAnalyze}
   <div class="p-8 bg-gray-100 space-y-4">
     <!-- タイトルとシェアボタン -->
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-bold text-gray-700">Result Analyze for {handle}</h2>
+    <div class="flex items-center justify-between mb-6 flex-wrap">
+      <h2 class="w-3/4 text-2xl font-bold text-gray-700 break-words">@{handle}'s Stats in Bluesky</h2>
       <!-- シェアボタン -->
       <button
         on:click={shareResult}
@@ -94,8 +94,9 @@
 
     <!-- Recent Friends -->
     <div>
-      <h3 class="text-xl font-semibold text-gray-800 mb-4">Relationship</h3>
+      <h3 class="text-2xl font-semibold text-gray-800 mb-4">Relationship</h3>
       <CardWide
+        id="recentfriends"
         title="Recent Friends"
         items={resultAnalyze.relationship.map((friend) => ({
           label: friend.displayName || '',
@@ -109,9 +110,10 @@
 
     <!-- all activity -->
     <div class="space-y-4">
-      <h3 class="text-xl font-semibold text-gray-800 mb-4">All Activity</h3>
+      <h3 class="text-2xl font-semibold text-gray-800 mb-4">All Activity</h3>
       <CardGrid cards={[
         {
+          id: "avarageAllInterval",
           type: "interval",
           title: 'Average Interval',
           content: resultAnalyze.activity.all.averageInterval,
@@ -132,10 +134,11 @@
     
     <!-- Post Activity -->
     <div class="space-y-4">
-      <h3 class="text-xl font-semibold text-gray-800 mb-4">Post Activity</h3>
+      <h3 class="text-2xl font-semibold text-gray-800 mb-4">Post Activity</h3>
       <CardGrid
         cards={[
-          { 
+          {
+            id: "avaragePostInterval",
             type: "interval",
             title: 'Avg Interval',
             content: resultAnalyze.activity.post.averageInterval,
@@ -152,7 +155,8 @@
       />
       
       {#if resultAnalyze.activity.post.wordFreqMap && resultAnalyze.activity.post.wordFreqMap.length > 0}
-        <CardWide 
+        <CardWide
+          id="wordfreq"
           title="Word Frequencies" 
           items={resultAnalyze.activity.post.wordFreqMap.map(word => ({ label: word.noun, value: word.count }))} 
         />
@@ -163,10 +167,11 @@
 
     <!-- Like Activity -->
     <div>
-      <h3 class="text-xl font-semibold text-gray-800 mb-4">Like Activity</h3>
+      <h3 class="text-2xl font-semibold text-gray-800 mb-4">Like Activity</h3>
       <CardGrid
         cards={[
           {
+            id: "avarageLikeInterval",
             type: "interval",
             title: 'Avg Interval',
             content: resultAnalyze.activity.like.averageInterval,
@@ -183,10 +188,11 @@
     
     <!-- Repost Activity -->
     <div>
-      <h3 class="text-xl font-semibold text-gray-800 mb-4">Repost Activity</h3>
+      <h3 class="text-2xl font-semibold text-gray-800 mb-4">Repost Activity</h3>
       <CardGrid
         cards={[
           {
+            id: "avarageRepostInterval",
             type: "interval",
             title: 'Avg Interval',
             content: resultAnalyze.activity.repost.averageInterval,

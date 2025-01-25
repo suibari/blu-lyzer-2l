@@ -1,11 +1,12 @@
 <script lang="ts">
+  import InfoWithTooltip from '../icons/InfoWithTooltip.svelte';
+
   export let title: string;
   export let content: string | number | null;
   export let percentile: number | null = null;
   export let percentileDesc: boolean = false;
-
-  // typeの定義
-  export let type: App.CardType; // "interval", "length", "date" のみに制限
+  export let type: App.CardType;
+  export let id: string | undefined;
 
   let displayContent: string | number | null = content;
 
@@ -35,7 +36,12 @@
 </script>
 
 <div class="border rounded-lg p-4 bg-white shadow-md">
-  <h3 class="text-lg font-bold text-gray-800">{title}</h3>
+  <div class="flex gap-2 items-center">
+    <h3 class="text-lg font-bold text-gray-800">{title}</h3>
+    {#if type === "interval" && id}
+      <InfoWithTooltip {id} key_i18n="stats.interval_info" />
+    {/if}
+  </div>
   <div class="text-xl text-gray-600 mt-2">
     {displayContent}
     {#if percentile}
