@@ -1,3 +1,4 @@
+import { PUBLIC_URL } from '$env/static/public';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, fetch, request }) => {
@@ -14,7 +15,7 @@ export const load: PageServerLoad = async ({ params, fetch, request }) => {
   const ogTitle = displayName ? `${displayName}'s Blu-lyzer Result` : "Analyze Result";
   const ogImage = avatar || "";
 
-  const ogUrl = url.pathname;
+  const ogUrl = PUBLIC_URL + url.pathname;
 
   return {
     meta: {
