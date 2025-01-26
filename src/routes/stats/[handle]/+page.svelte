@@ -15,12 +15,19 @@
 
   // for dynamic OGP
   let { data }: PageProps = $props();
-  const { 
-    displayName = 'ユーザー',
-    ogTitle = 'Result Analyze | Blu-lyzer',
-    ogImage = 'https://blu-lyzer.suibari.com/ogp.png',
-    ogUrl = 'https://blu-lyzer.suibari.com'
-  } = data.meta;
+
+  let displayName: string = $state("Unknown User");
+  let ogTitle: string = $state("Analyze Result | Blu-lyzer");
+  let ogImage: string = $state("https://blu-lyzer.suibari.com/ogp.png");
+  let ogUrl: string = $state("https://blu-lyzer.suibari.com");
+  $effect(() => {
+    if (data.meta) {
+      displayName = data.meta.displayName;
+      ogTitle = data.meta.ogTitle;
+      ogImage = data.meta.ogImage;
+      ogUrl = data.meta.ogUrl;
+    }
+  });
 
   let handle: string = $state("");
   let resultAnalyze: App.ResultAnalyze | null = $state(null);
