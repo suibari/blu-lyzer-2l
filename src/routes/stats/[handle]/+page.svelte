@@ -21,14 +21,13 @@
   let ogImage: string = $state("https://blu-lyzer.suibari.com/ogp.png");
   let ogUrl: string = $state("https://blu-lyzer.suibari.com");
 
-  // データ取得
-  $effect(() => {
-    const meta = data.meta;
+  onMount(() => {
+    const meta = data?.meta;
     if (meta) {
-      displayName = meta.displayName || displayName;
-      ogTitle = meta.ogTitle || ogTitle;
-      ogImage = meta.ogImage || ogImage;
-      ogUrl = meta.ogUrl || ogUrl;
+      displayName = meta.displayName;
+      ogTitle = meta.ogTitle;
+      ogImage = meta.ogImage;
+      ogUrl = meta.ogUrl;
     }
   });
 
