@@ -117,18 +117,21 @@ async function getRecentFriends(did: string, posts: App.RecordExt[], likes: App.
 
   // getProfilesし、recentFriendsに名前やアバターを追加
   const actors = recentFriendsSliced.map(friend => friend.did);
-  await sessionManager.createOrRefreshSession();
-  const agent = sessionManager.getAgent();
-  const {data} = await agent.getProfiles({actors});
-  recentFriendsSliced.forEach(friend => {
-    const matchProf = data.profiles.find(profile => profile.did === friend.did);
-    if (matchProf) {
-      friend.handle = matchProf.handle;
-      friend.displayName = matchProf.displayName;
-      friend.avator = matchProf.avatar;
-    }
-  })
 
+  if (actors.length > 0) {
+    await sessionManager.createOrRefreshSession();
+    const agent = sessionManager.getAgent();
+    const {data} = await agent.getProfiles({actors});
+    recentFriendsSliced.forEach(friend => {
+      const matchProf = data.profiles.find(profile => profile.did === friend.did);
+      if (matchProf) {
+        friend.handle = matchProf.handle;
+        friend.displayName = matchProf.displayName;
+        friend.avator = matchProf.avatar;
+      }
+    })  
+  }
+  
   return recentFriendsSliced;
 }
 

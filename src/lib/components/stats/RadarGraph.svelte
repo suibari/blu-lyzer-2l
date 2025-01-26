@@ -80,15 +80,14 @@
   });
 
   function calculateInfluencer(followsCount: number, followersCount: number): number {
-  if (followsCount === 0) {
-    return followersCount > 0 ? 100 : 0; // フォローが0のときの特例処理
-  }
-
   // フォロワー数とフォロー数の比率を計算
-  const ratio = followersCount / followsCount;
+  const ratioBias = (followersCount / (followsCount + 1));
 
-  // スコアを50を基準にして計算し、倍率に応じて値を調整
-  const influence = 50 + (Math.log10(ratio) * 25);
+  // フォロワー数のスケールに基づくバイアス（logスケールで調整）
+  const followerBias = Math.log10(followersCount + 1) * 8; // +1で0フォロワー時の対数回避
+
+  // スコアを50を基準に計算し、比率とフォロワーバイアスを組み合わせ
+  const influence = (ratioBias ) + (followerBias);
 
   // 最小0、最大100に制限
   return Math.min(Math.max(influence, 0), 100);
