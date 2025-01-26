@@ -16,20 +16,11 @@
   // for dynamic OGP
   let { data }: PageProps = $props();
 
-  let displayName: string = $state("Unknown User");
-  let ogTitle: string = $state("Analyze Result | Blu-lyzer");
-  let ogImage: string = $state("https://blu-lyzer.suibari.com/ogp.png");
-  let ogUrl: string = $state("https://blu-lyzer.suibari.com");
-
-  onMount(() => {
-    const meta = data?.meta;
-    if (meta) {
-      displayName = meta.displayName;
-      ogTitle = meta.ogTitle;
-      ogImage = meta.ogImage;
-      ogUrl = meta.ogUrl;
-    }
-  });
+  let displayName = $state(data?.meta.displayName);
+  let ogTitle = $state(data?.meta.ogTitle);
+  let ogImage = $state(data?.meta.ogImage);
+  let ogUrl = $state(data?.meta.ogUrl);
+  const title = `${displayName}${$t("stats.ogp_title")} | Blu-lyzer`;
 
   let handle: string = $state("");
   let resultAnalyze: App.ResultAnalyze | null = $state(null);
@@ -241,7 +232,7 @@
 {/if}
 
 <svelte:head>
-  <title>{displayName}{$t("stats.ogp_title")} | Blu-lyzer</title>
+  <title>{title}</title>
   <meta property="og:title" content={ogTitle} />
   <meta property="og:image" content={ogImage} />
   <meta property="og:url" content={ogUrl} />
