@@ -32,7 +32,7 @@
 
   onMount(async () => {
     try {
-      const res = await fetch(`/stats/${handle}`);
+      const res = await fetch(`/stats/${handle}/analyze`);
       if (res.ok) {
         const data = await res.json();
         resultAnalyze = shiftHeatmapInResultAnalyze(data.resultAnalyze); // タイムゾーン変換
@@ -231,8 +231,7 @@
 <svelte:head>
   <title>{displayName}{$t("stats.ogp_title")} | Blu-lyzer</title>
   <meta property="og:title" content={ogTitle} />
-  <!-- <meta property="og:image" content={ogImage} /> -->
-  <meta property="og:image" content="https://blu-lyzer.suibari.com/ogp.png">
+  <meta property="og:image" content={ogImage} />
   <meta property="og:url" content={ogUrl} />
   <meta property="og:type" content="website" />
 </svelte:head>
