@@ -17,7 +17,7 @@
 
   // for dynamic OGP
   let { data }: PageProps = $props();
-  const { displayName, ogTitle, ogImage } = data.meta;
+  const { displayName, ogTitle, ogImage, ogUrl } = data.meta;
 
   let handle: string = $state("");
   let resultAnalyze: App.ResultAnalyze | null = $state(null);
@@ -232,5 +232,6 @@
   <title>{displayName}{$t("stats.ogp_title")} | Blu-lyzer</title>
   <meta property="og:title" content={ogTitle} />
   <meta property="og:image" content={ogImage} />
+  <meta property="og:url" content={ogUrl} />
   <meta property="og:type" content="website" />
 </svelte:head>

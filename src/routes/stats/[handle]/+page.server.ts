@@ -1,3 +1,5 @@
+import { page } from '$app/state';
+
 export async function load({ params, fetch }) {
   const handle = params.handle;
 
@@ -11,11 +13,14 @@ export async function load({ params, fetch }) {
   const ogTitle = displayName ? `${displayName}'s Blu-lyzer Result` : "Analyze Result";
   const ogImage = avatar || "";
 
+  const ogUrl = page.url.pathname;
+
   return {
     meta: {
       displayName,
       ogTitle,
-      ogImage
+      ogImage,
+      ogUrl
     }
   };
 }
