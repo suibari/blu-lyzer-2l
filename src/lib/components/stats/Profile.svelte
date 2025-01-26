@@ -2,7 +2,7 @@
   import type { AppBskyActorProfile } from "@atproto/api";
     import RadarGraph from "./RadarGraph.svelte";
 
-  export let profile: AppBskyActorProfile.Record;
+  export let profile: AppBskyActorProfile.Record | null;
   export let activityHeatmap: number[];
   export let sentimentHeatmap: number[];
   export let percentiles;
@@ -13,18 +13,18 @@
   <div class="flex flex-col items-start md:w-1/2 sm:w-full">
     <!-- Avatar and DisplayName -->
     <div class="flex items-center mb-4">
-      <a href="https://bsky.app/profile/{profile.handle}" target="_blank" >
+      <a href="https://bsky.app/profile/{profile?.handle}" target="_blank" >
         <img
-          src={String(profile.avatar) || '/avatar.png'}
+          src={String(profile?.avatar) || '/avatar.png'}
           alt="Avatar"
           class="w-16 h-16 rounded-full border-2 border-gray-300 mr-4 object-contain"
         />
       </a>
-      <h2 class="text-2xl font-semibold text-gray-800">{profile.displayName? profile.displayName : profile.handle}</h2>
+      <h2 class="text-2xl font-semibold text-gray-800">{profile?.displayName ? profile.displayName : profile?.handle}</h2>
     </div>
 
     <!-- Profile Description -->
-    <p class="text-md text-gray-600 whitespace-pre-wrap">{profile.description}</p>
+    <p class="text-md text-gray-600 whitespace-pre-wrap">{profile?.description}</p>
   </div>
 
   <!-- Right side: Radar Chart -->

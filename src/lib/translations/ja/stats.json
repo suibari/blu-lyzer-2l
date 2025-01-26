@@ -13,5 +13,6 @@
   "interval_info": "活動の時間間隔の平均。Rankの数値はBlu-lyzerユーザの上位から何パーセントかを意味する",
   "active_heatmap_info": "何時にどのような活動が多いかのヒートマップ",
   "sentiment_heatmap_info": "何時にどのような感情のことが多いかを表すヒートマップ。0を基準としてプラスが大きいほど明るい気持ちで、マイナスが大きいほど暗い気持ちを意味する",
-  "wordfreq_info": "よくポストする言葉"
+  "wordfreq_info": "よくポストする言葉",
+  "ogp_title": "さんの分析結果"
 }

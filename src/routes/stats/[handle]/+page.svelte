@@ -11,17 +11,24 @@
   import { Spinner } from 'flowbite-svelte';
   import { shiftHeatmapInResultAnalyze } from '$lib/components/stats/shiftHeatmapByTimezone';
   import { t } from '$lib/translations/translations';
+  import type { PageProps } from './$types';
 
-  let handle: string;
-  let resultAnalyze: App.ResultAnalyze;
-  let percentiles: App.Percentiles;
-  let profile: AppBskyActorProfile.Record;
-  let error: string | null = null;
+  export const prerender = false; // 動的レンダリングにする
+
+  // for dynamic OGP
+  let { data }: PageProps = $props();
+  const { displayName, ogTitle, ogImage } = data.meta;
+
+  let handle: string = $state("");
+  let resultAnalyze: App.ResultAnalyze | null = $state(null);
+  let percentiles: App.Percentiles | null = $state(null);
+  let profile: AppBskyActorProfile.Record | null = $state(null);
+  let error: string | null = $state(null);
 
   // ------------------------
   // fetch
   // ------------------------
-  $: handle = page.params.handle;
+  $effect(() => {handle = page.params.handle});
 
   onMount(async () => {
     try {
@@ -77,7 +84,7 @@
       <h2 class="w-3/4 text-2xl font-bold text-gray-700 break-words">@{handle}'s Stats in Bluesky</h2>
       <!-- シェアボタン -->
       <button
-        on:click={shareResult}
+        onclick={shareResult}
         aria-label="Share"
         class="text-2xl p-2 rounded-full hover:bg-primary-900"
       >
@@ -220,3 +227,10 @@
     <Spinner color="blue" size={12} class="text-center" />
   </div>
 {/if}
+
+<svelte:head>
+  <title>{displayName}{$t("stats.ogp_title")} | Blu-lyzer</title>
+  <meta property="og:title" content={ogTitle} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:type" content="website" />
+</svelte:head>
