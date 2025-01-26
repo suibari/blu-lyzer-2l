@@ -37,15 +37,13 @@ export const GET: RequestHandler = async ({ params }) => {
     if (data) {
       // DBに存在: 既存ユーザ
       console.log(`[INFO] existing user: ${handle}`);
-      const resultAnalyze = transformDbToApp(data.result_analyze, data.updated_at);
 
-      return new Response(JSON.stringify({ resultAnalyze, profile }), { status: 200 });
+      return new Response(JSON.stringify({ profile }), { status: 200 });
     } else {
       // DBに存在しない: 新規ユーザ
       console.log(`[INFO][OGP] new user! : ${handle}`);
-      const newResultAnalyze = await getRecordsAndAnalyze(handle, did, 100);
 
-      return new Response(JSON.stringify({ resultAnalyze: newResultAnalyze, profile }), { status: 200 });
+      return new Response(JSON.stringify({ profile }), { status: 200 });
     }
 
   } catch (err: any) {

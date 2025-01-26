@@ -13,11 +13,14 @@
   import { t } from '$lib/translations/translations';
   import type { PageProps } from './$types';
 
-  export const prerender = false; // 動的レンダリングにする
-
   // for dynamic OGP
   let { data }: PageProps = $props();
-  const { displayName, ogTitle, ogImage, ogUrl } = data.meta;
+  const { 
+    displayName = 'ユーザー',
+    ogTitle = 'Result Analyze | Blu-lyzer',
+    ogImage = 'https://blu-lyzer.suibari.com/ogp.png',
+    ogUrl = 'https://blu-lyzer.suibari.com'
+  } = data.meta;
 
   let handle: string = $state("");
   let resultAnalyze: App.ResultAnalyze | null = $state(null);

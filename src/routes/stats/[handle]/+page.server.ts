@@ -1,8 +1,8 @@
-import { PUBLIC_URL } from '$env/static/public';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, fetch, request }) => {
-  const url = new URL(request.url); // ここで現在のリクエストのURLを取得
+export const prerender = false; // 動的レンダリングにする
+
+export const load: PageServerLoad = async ({ params, fetch, url }) => {
   const handle = params.handle;
 
   // サーバからデータを取得
@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ params, fetch, request }) => {
   const ogTitle = displayName ? `${displayName}'s Blu-lyzer Result` : "Analyze Result";
   const ogImage = avatar || "";
 
-  const ogUrl = PUBLIC_URL + url.pathname;
+  const ogUrl = url.origin + url.pathname;
 
   return {
     meta: {
