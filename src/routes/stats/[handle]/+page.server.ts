@@ -2,6 +2,13 @@ import type { PageServerLoad } from './$types';
 
 export const prerender = false; // 動的レンダリングにする
 
+interface MetaData {
+  displayName: string;
+  ogTitle: string;
+  ogImage: string;
+  ogUrl: string;
+}
+
 export const load: PageServerLoad = async ({ params, fetch, url }) => {
   const handle = params.handle;
 
@@ -23,6 +30,6 @@ export const load: PageServerLoad = async ({ params, fetch, url }) => {
       ogTitle,
       ogImage,
       ogUrl
-    }
+    } as MetaData
   };
 };

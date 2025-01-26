@@ -20,12 +20,15 @@
   let ogTitle: string = $state("Analyze Result | Blu-lyzer");
   let ogImage: string = $state("https://blu-lyzer.suibari.com/ogp.png");
   let ogUrl: string = $state("https://blu-lyzer.suibari.com");
+
+  // データ取得
   $effect(() => {
-    if (data.meta) {
-      displayName = data.meta.displayName;
-      ogTitle = data.meta.ogTitle;
-      ogImage = data.meta.ogImage;
-      ogUrl = data.meta.ogUrl;
+    const meta = data.meta;
+    if (meta) {
+      displayName = meta.displayName || displayName;
+      ogTitle = meta.ogTitle || ogTitle;
+      ogImage = meta.ogImage || ogImage;
+      ogUrl = meta.ogUrl || ogUrl;
     }
   });
 
