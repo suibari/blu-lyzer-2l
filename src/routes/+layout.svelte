@@ -7,8 +7,6 @@
 
   let aboutModal = false;
   let changeLogModal = false;
-
-  const defaultLanguage = "ja"
 </script>
 
 <div class="flex flex-col min-h-screen">

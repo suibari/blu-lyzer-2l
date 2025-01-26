@@ -2,7 +2,7 @@ export async function load({ params, fetch }) {
   const handle = params.handle;
 
   // サーバからデータを取得
-  const response = await fetch(`/stats/${handle}`);
+  const response = await fetch(`/stats/${handle}/ogp`);
   const data = await response.json();
 
   const displayName = data.profile.displayName;
