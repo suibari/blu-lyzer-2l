@@ -1,3 +1,4 @@
+import type { AppBskyActorProfile } from "@atproto/api";
 import type { Record } from '@atproto/api/dist/client/types/com/atproto/repo/listRecords';
 
 // See https://svelte.dev/docs/kit/types#app.d.ts
@@ -19,6 +20,11 @@ declare global {
 				cid: string,
 				uri: string,
 			},
+		}
+
+		interface ProfileExt extends AppBskyActorProfile.Record {
+			followsCount?: number;
+			followersCount?: number;
 		}
 
 		// My-App

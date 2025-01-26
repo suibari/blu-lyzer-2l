@@ -14,5 +14,7 @@
   "active_heatmap_info": "A heatmap showing when and what kind of activities occur most frequently",
   "sentiment_heatmap_info": "A heatmap representing emotional trends by hour. Positive values above 0 indicate bright feelings, while negative values below 0 indicate darker emotions.",
   "wordfreq_info": "Frequently posted words",
-  "ogp_title": "'s Analyze Result"
+  "ogp_title": "'s Analyze Result",
+  "nickname_title": "You are the ...",
+  "nickname_info": "A title that expresses the user. Based on the contents of the radar chart"
 }

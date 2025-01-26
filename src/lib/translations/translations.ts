@@ -12,6 +12,13 @@ const config = ({
     },
     {
       locale: 'en',
+      key: 'nickname',
+      loader: async () => (
+        await import('./en/nickname.json')
+      ).default,
+    },
+    {
+      locale: 'en',
       key: 'stats',
       loader: async () => (
         await import('./en/stats.json')
@@ -22,6 +29,13 @@ const config = ({
       key: 'top',
       loader: async () => (
         await import('./ja/top.json')
+      ).default,
+    },
+    {
+      locale: 'ja',
+      key: 'nickname',
+      loader: async () => (
+        await import('./ja/nickname.json')
       ).default,
     },
     {

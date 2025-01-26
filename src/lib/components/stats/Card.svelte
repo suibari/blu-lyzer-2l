@@ -29,6 +29,20 @@
   function fixPercentile(percentile: number, desc: boolean): number {
     return Math.round(percentile * 100) / 100;
   }
+
+  function getPercentileClass(percentile: number) {
+    if (percentile <= 10) {
+      return 'text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 font-bold';
+    } else if (percentile <= 20) {
+      return 'text-green-500 font-semibold';
+    } else if (percentile <= 40) {
+      return 'text-green-400 font-semibold';
+    } else if (percentile <= 60) {
+      return 'text-yellow-500 font-semibold';
+    } else {
+      return 'text-red-500';
+    }
+  }
 </script>
 
 <div class="border rounded-lg p-4 bg-white shadow-md">
@@ -41,7 +55,9 @@
   <div class="text-xl text-gray-600 mt-2">
     {displayContent}
     {#if percentile}
-      <span class="text-gray-500"> (Rank: Top {fixPercentile(percentile, percentileDesc)}%)</span>
+      <span class="{getPercentileClass(percentile)}">
+        (Rank: Top {fixPercentile(percentile, percentileDesc)}%)
+      </span>
     {/if}
   </div>
 </div>

@@ -1,0 +1,32 @@
+{
+  "adjectives": {
+    "influencer": "Beloved by everyone|Admired by all|Top trending",
+    "morningPerson": "Health-conscious|Awakens with the sunrise|Faster than sunlight|Brings balance to the Feed",
+    "nightOwl": "Sleepless and tireless|Master of the night|Ruler of the nightlife",
+    "positivity": "Lights up the Feed, |Brings smiles to everyone|Spreads hope|Radiates positivity",
+    "postingFreq": "Talkative and quick-witted|Center of conversation|Posts faster than the speed of light",
+    "likingFreq": "Shouts love from the center of the world|Fills the Bluesky with affection|Loves everyone endlessly",
+    "repostFreq": "Well-informed|Knows everything|The ultimate amplifier",
+    "longpostFreq": "Attention to detail|Deeply thoughtful"
+  },
+  "nouns": {
+    "influencer": "Top Blueskyer|Charismatic Leader|Trendsetter|Automatic Follower Generator",
+    "morningPerson": "Early Riser|Shining Star|Sunrise Seeker",
+    "nightOwl": "Night Owl|Dark Knight|Nocturnal Hero|Dark Lord of the Shadows",
+    "positivity": "Social Butterfly|Laughter Maker|Mood Lifter|Joy Bringer",
+    "postingFreq": "Talk Master|Opinion Leader|Endless Post Creator|Alchemist of Posts",
+    "likingFreq": "Love Machine|Affirmation Expert|Empathy Guru|Like Champion",
+    "repostFreq": "Reporter|Journalist|Public Relations Specialist|Feed Curator",
+    "longpostFreq": "Thinker|Philosopher|Story Weaver|Keeper of Tales"
+  },
+  "emoji": {
+    "influencer": "🦋",
+    "morningPerson": "🌅",
+    "nightOwl": "🌉",
+    "positivity": "🪩",
+    "postingFreq": "🗣️",
+    "likingFreq": "💝",
+    "repostFreq": "📰",
+    "longpostFreq": "🧐"
+  }
+}

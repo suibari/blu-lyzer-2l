@@ -24,8 +24,8 @@
 
   let handle: string = $state("");
   let resultAnalyze: App.ResultAnalyze | null = $state(null);
-  let percentiles: App.Percentiles | null = $state(null);
-  let profile: AppBskyActorProfile.Record | null = $state(null);
+  let percentiles: App.Percentiles = $state({} as App.Percentiles);
+  let profile: App.ProfileExt = $state({} as App.ProfileExt);
   let error: string | null = $state(null);
 
   // ------------------------

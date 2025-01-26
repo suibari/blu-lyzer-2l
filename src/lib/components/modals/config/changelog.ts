@@ -1,5 +1,13 @@
 export const changelog = [
   {
+    "version": "v0.3.2",
+    "date": "2025/1/27",
+    "changes": [
+      "称号機能を追加",
+      "パーセンタイルを結果に応じて色付け"
+    ]
+  },
+  {
     "version": "v0.3.1",
     "date": "2025/1/26",
     "changes": [
