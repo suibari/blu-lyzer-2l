@@ -1,51 +1,59 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
   import { Chart } from 'chart.js/auto';
-  import { Tooltip } from 'flowbite-svelte';
-  import IcBaselineInfo from '../icons/IcBaselineInfo.svelte';
-  import { t } from '$lib/translations/translations';
-    import InfoWithTooltip from '../icons/InfoWithTooltip.svelte';
+  import InfoWithTooltip from "../icons/InfoWithTooltip.svelte";
 
-  export let data: number[];
-  export let centerZero: boolean = false;
+  interface Props {
+    data: number[];
+    centerZero: boolean;
+  }
+  let { data, centerZero = false }: Props = $props();
 
-  let chart: Chart | null = null;
+  let chartData = $state({data, centerZero});
 
-  onMount(() => {
-    const ctx = document.getElementById('lineChart') as HTMLCanvasElement;
-    chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: data.map((_, i) => `${i}:00`),
-        datasets: [
-          {
-            label: 'Sentiment Heatmap',
-            data: data,
-            borderColor: 'rgba(75, 192, 192, 0.6)',
-            fill: false,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false, // アスペクト比を無視
-        scales: {
-          y: {
-            beginAtZero: false,
-            min: centerZero ? -Math.max(...data.map(Math.abs)) : undefined, // 最小値
-            max: centerZero ? Math.max(...data.map(Math.abs)) : undefined,  // 最大値
+  function chart(_p0: HTMLCanvasElement, datasets: Props) {
+    let chartInstance: Chart;
+    const node = document.getElementById('lineChart') as HTMLCanvasElement;
+
+    function createChart(datasets: Props) {
+      chartInstance = new Chart(node, {
+        type: "line",
+        data: {
+          labels: datasets.data.map((_, i) => `${i}:00`), // 時間ラベル
+          datasets: [
+            {
+              label: "Sentiment Heatmap",
+              data: datasets.data,
+              borderColor: "rgba(75, 192, 192, 0.6)",
+              fill: false,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: centerZero ? -Math.max(...datasets.data.map(Math.abs)) : undefined,
+              max: centerZero ? Math.max(...datasets.data.map(Math.abs)) : undefined,
+            },
           },
         },
-      },
-    });
+      });
+    }
 
-    // クリーンアップ処理
-    onDestroy(() => {
-      if (chart) {
-        chart.destroy();
-      }
-    });
-  });
+    createChart(datasets);
+
+    return {
+      update(newData: Props) {
+        chartInstance.destroy();
+        createChart(newData);
+      },
+      destroy() {
+        chartInstance.destroy();
+      },
+    };
+  }
 </script>
 
 {#if data.find(d => d !== 0)}
@@ -54,8 +62,8 @@
       <h3 class="text-xl font-semibold text-gray-800">Sentiment Heatmap</h3>
       <InfoWithTooltip id="sentimentHeatmap" key_i18n="stats.sentiment_heatmap_info" />
     </div>
-    <div class="relative w-full h-64"> <!-- 親要素のサイズに合わせる -->
-      <canvas id="lineChart"></canvas>
+    <div class="relative w-full h-64">
+      <canvas id="lineChart" use:chart={$state.snapshot(chartData)}></canvas>
     </div>
   </div>
 {/if}

@@ -1,5 +1,13 @@
 export const changelog = [
   {
+    "version": "v0.3.1",
+    "date": "",
+    "changes": [
+      "ポジティブ度の計算を見直し(厳しめになるように調整)",
+      "分析結果ページのOGPなどを修正",
+    ]
+  },
+  {
     "version": "v0.3.0",
     "date": "",
     "changes": [
