@@ -1,6 +1,7 @@
-import { page } from '$app/state';
+import type { PageServerLoad } from './$types';
 
-export async function load({ params, fetch }) {
+export const load: PageServerLoad = async ({ params, fetch, request }) => {
+  const url = new URL(request.url); // ここで現在のリクエストのURLを取得
   const handle = params.handle;
 
   // サーバからデータを取得
@@ -13,7 +14,7 @@ export async function load({ params, fetch }) {
   const ogTitle = displayName ? `${displayName}'s Blu-lyzer Result` : "Analyze Result";
   const ogImage = avatar || "";
 
-  const ogUrl = page.url.pathname;
+  const ogUrl = url.pathname;
 
   return {
     meta: {
@@ -23,4 +24,4 @@ export async function load({ params, fetch }) {
       ogUrl
     }
   };
-}
+};
