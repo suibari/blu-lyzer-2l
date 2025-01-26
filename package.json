@@ -35,6 +35,7 @@
 		"date-fns-tz": "^3.2.0",
 		"inngest": "^3.30.0",
 		"lodash": "^4.17.21",
+		"sharp": "^0.33.5",
 		"sveltekit-i18n": "^2.4.2"
 	}
 }

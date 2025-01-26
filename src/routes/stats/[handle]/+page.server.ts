@@ -17,10 +17,9 @@ export const load: PageServerLoad = async ({ params, fetch, url }) => {
   const data = await response.json();
 
   const displayName = data.profile.displayName;
-  const avatar = data.profile.avatar;
 
   const ogTitle = displayName ? `${displayName}'s Blu-lyzer Result` : "Analyze Result";
-  const ogImage = avatar || "";
+  const ogImage = data.ogImage || "https://blu-lyzer.suibari.com/ogp.png";
 
   const ogUrl = url.origin + url.pathname;
 
