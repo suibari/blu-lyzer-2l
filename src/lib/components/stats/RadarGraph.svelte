@@ -13,6 +13,7 @@
   export let percentiles;
 
   let chart: Chart | null = null;
+  console.log(percentiles)
 
   onMount(() => {
     const ctx = document.getElementById('radarChart') as HTMLCanvasElement;
@@ -39,10 +40,10 @@
                 calculateMorningPerson(activityHeatmap),
                 calculateNightPerson(activityHeatmap),
                 calculateSentimentTotal(sentimentHeatmap),
-                100 - percentiles.averagePostsInterval || 0,
-                100 - percentiles.averageLikeInterval || 0,
-                100 - percentiles.averageRepostInterval || 0,
-                100 - percentiles.averageTextLength || 0,
+                (percentiles.averagePostsInterval === null) ? 0 : 100 - percentiles.averagePostsInterval,
+                (percentiles.averageLikeInterval === null) ? 0 : 100 - percentiles.averageLikeInterval,
+                (percentiles.averageRepostInterval === null) ? 0 : 100 - percentiles.averageRepostInterval,
+                (percentiles.averageTextLength === null) ? 0 : 100 - percentiles.averageTextLength,
               ],
               backgroundColor: 'rgba(54, 162, 235, 0.2)',
               borderColor: 'rgba(54, 162, 235, 1)',
