@@ -1,8 +1,14 @@
 // src/hooks.server.ts
+import SessionManager from '$lib/server/bluesky/sessionManager';
 import { sequence } from '@sveltejs/kit/hooks';
+
+const sessionManager = SessionManager.getInstance();
 
 export const handle = sequence(
   async ({ event, resolve }) => {
+    // セッション更新
+    await sessionManager.createOrRefreshSession();
+
     // Accept-Languageヘッダーを取得
     const acceptLanguage = event.request.headers.get('accept-language');
     const defaultLocale = 'en'; // デフォルトロケール（enにフォールバック）

@@ -11,7 +11,7 @@ export const GET: RequestHandler = async ({ url }) => {
     return new Response(JSON.stringify([]), { status: 200 });
   }
 
-  await sessionManager.createOrRefreshSession();
+  // await sessionManager.createOrRefreshSession();
   const {data} = await agent.app.bsky.actor.searchActorsTypeahead({q});
 
   return new Response(JSON.stringify(data.actors.slice(0, 5)), { status: 200 }); // 5件のみ返す

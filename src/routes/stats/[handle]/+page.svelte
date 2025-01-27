@@ -40,7 +40,6 @@
       if (res.ok) {
         const data = await res.json();
         resultAnalyze = shiftHeatmapInResultAnalyze(data.resultAnalyze); // タイムゾーン変換
-        console.log(resultAnalyze)
         summary = data.summary;
         percentiles = data.percentiles;
         profile = data.profile;

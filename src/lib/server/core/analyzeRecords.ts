@@ -119,7 +119,7 @@ async function getRecentFriends(did: string, posts: App.RecordExt[], likes: App.
   const actors = recentFriendsSliced.map(friend => friend.did);
 
   if (actors.length > 0) {
-    await sessionManager.createOrRefreshSession();
+    // await sessionManager.createOrRefreshSession();
     const agent = sessionManager.getAgent();
     const {data} = await agent.getProfiles({actors});
     recentFriendsSliced.forEach(friend => {

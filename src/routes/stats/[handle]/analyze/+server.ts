@@ -20,7 +20,7 @@ export const GET: RequestHandler = async ({ params }) => {
   console.log(`[INFO] receive handle: ${handle}`);
 
   try {
-    await sessionManager.createOrRefreshSession();
+    // await sessionManager.createOrRefreshSession();
     const agent = sessionManager.getAgent();
 
     // プロフィール取得の試行
