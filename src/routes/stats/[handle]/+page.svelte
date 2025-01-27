@@ -57,7 +57,12 @@
   // ------------------------
   const shareResult = async () => {
     const shareUrl = `https://blu-lyzer.suibari.com/stats/${handle}`
-    const shareText = $t("stats.share_text") + ` ${shareUrl}`;
+    const shareTextBase = String($t("stats.share_text"));
+    const shareTextReplaced = shareTextBase
+      .replace('${displayName}', profile.displayName || "Unknown User")
+      .replace('${randomAdjective}', document.getElementById('randomAdjective')?.innerText || "Unknown")
+      .replace('${randomNounEmoji}', document.getElementById('randomNounEmoji')?.innerText || "User");
+    const shareText = shareTextReplaced + ` ${shareUrl}`;
 
     if (navigator.share) {
       // Web Share API をサポートしている場合

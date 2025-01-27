@@ -1,6 +1,6 @@
 <script lang="ts">
   import { t } from '$lib/translations/translations';
-    import InfoWithTooltip from '../icons/InfoWithTooltip.svelte';
+  import InfoWithTooltip from '../icons/InfoWithTooltip.svelte';
 
   export let influencer: number;
   export let morningPerson: number;
@@ -22,7 +22,6 @@
     longpostFreq,
   };
 
-  // 最も大きい & 2番目に大きい値を取得
   const sortedStats = Object.entries(stats).sort(([, a], [, b]) => b - a);
   const [mostSignificant, secondMostSignificant] = sortedStats;
 
@@ -44,8 +43,7 @@
     <InfoWithTooltip id="nickname" key_i18n="stats.nickname_info" />
   </div>
   <p class="text-3xl sm:text-4xl md:text-5xl text-gray-600 font-bold mb-2 dela-gothic">
-    <span class="block sm:inline">{randomAdjective}</span>
-    <span class="block sm:inline">{randomNoun}{emoji}</span>
-    
+    <span id="randomAdjective" class="block sm:inline">{randomAdjective}</span>
+    <span id="randomNounEmoji" class="block sm:inline">{randomNoun}{emoji}</span>
   </p>
 </div>

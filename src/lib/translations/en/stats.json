@@ -1,5 +1,5 @@
 {
-  "share_text": "Check out the results on Blu-lyzer! #Blu-lyzer",
+  "share_text": "${displayName} is the ${randomAdjective} ${randomNounEmoji} on Bluesky! #Blu-lyzer",
   "radar_info": "A radar chart showing the user's Bluesky style",
   "radar_influencer": "Influencer",
   "radar_morning_person": "Morning Person",

@@ -5,17 +5,15 @@ export const handle = sequence(
   async ({ event, resolve }) => {
     // Accept-Languageヘッダーを取得
     const acceptLanguage = event.request.headers.get('accept-language');
-    const defaultLocale = 'en'; // デフォルトロケール
-    const supportedLocales = ['en', 'ja']; // サポートしているロケール
+    const defaultLocale = 'en'; // デフォルトロケール（enにフォールバック）
+    const supportedLocale = 'ja'; // サポートするのはjaのみ、それ以外はenにする
 
-    let userLocale = defaultLocale;
+    let userLocale = defaultLocale; // 初期値としてenを設定
 
     if (acceptLanguage) {
-      // Accept-Languageの中から最適なロケールを選択
-      userLocale = acceptLanguage.split(',')[0].split('-')[0]; // "en-US" -> "en"
-      if (!supportedLocales.includes(userLocale)) {
-        userLocale = defaultLocale;
-      }
+      // Accept-Languageの中からロケールを抽出
+      const locale = acceptLanguage.split(',')[0].split('-')[0]; // "en-US" -> "en"
+      userLocale = locale === supportedLocale ? supportedLocale : defaultLocale;
     }
 
     // ロケールを locals に保存してクライアントへ渡す
