@@ -4,7 +4,7 @@ import { analyzeRecords } from "../core/analyzeRecords";
 import { transformAppToDb } from "../core/transformType";
 import { supabase } from "../supabase";
 
-export const propertyNames = [
+const propertyNames = [
   "averageInterval",
   "averagePostsInterval",
   "averageLikeInterval",
@@ -19,7 +19,7 @@ export async function getRecordsAndAnalyze (handle: string, did: string, limit: 
   return resultAnalyze;
 }
 
-export async function upsertRecords (handle: string, resultAnalyze: App.ResultAnalyze, percentiles: Record<string, { value: number } | null> | null) {
+export async function upsertRecords (handle: string, resultAnalyze: App.ResultAnalyze, percentiles: App.Percentiles | null) {
   await supabase
     .from("records")
     .upsert([{
@@ -37,7 +37,7 @@ export async function upsertRecords (handle: string, resultAnalyze: App.ResultAn
  * @param propertyNames 複数のプロパティ名
  * @returns 各プロパティのパーセンタイルと値を含むオブジェクト
  */
-export async function getPercentilesForProperties(handle: string, propertyNames: string[]) {
+export async function getPercentilesForProperties(handle: string) {
   const percentiles: Record<string, { value: number } | null> = {};
 
   // 各プロパティ名について順次RPCを実行
@@ -62,5 +62,5 @@ export async function getPercentilesForProperties(handle: string, propertyNames:
     }
   }
 
-  return percentiles;
+  return percentiles as unknown as App.Percentiles;
 }

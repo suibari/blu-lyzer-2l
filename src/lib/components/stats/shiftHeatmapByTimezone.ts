@@ -3,17 +3,11 @@ import { toZonedTime } from 'date-fns-tz';  // タイムゾーン変換関数
 export function shiftHeatmapInResultAnalyze(resultAnalyze: App.ResultAnalyze): App.ResultAnalyze {
   const shiftedResultAnalyze = resultAnalyze;
 
-  const shiftedActionHeatmap = shiftHeatmap(resultAnalyze.activity.all.actionHeatmap);
-  const shiftedPostHeatmap = shiftHeatmap(resultAnalyze.activity.post.actionHeatmap);
-  const shiftedLikeHeatmap = shiftHeatmap(resultAnalyze.activity.like.actionHeatmap);
-  const shiftedRepostHeatmap = shiftHeatmap(resultAnalyze.activity.repost.actionHeatmap);
-  const shiftedSentimentHeatmap = shiftHeatmap(resultAnalyze.activity.post.sentimentHeatmap);
-
-  shiftedResultAnalyze.activity.all.actionHeatmap = shiftedActionHeatmap;
-  shiftedResultAnalyze.activity.post.actionHeatmap = shiftedPostHeatmap;
-  shiftedResultAnalyze.activity.like.actionHeatmap = shiftedLikeHeatmap;
-  shiftedResultAnalyze.activity.repost.actionHeatmap = shiftedRepostHeatmap;
-  shiftedResultAnalyze.activity.post.sentimentHeatmap = shiftedSentimentHeatmap;
+  shiftedResultAnalyze.activity.all.actionHeatmap = resultAnalyze.activity.all.actionHeatmap ? shiftHeatmap(resultAnalyze.activity.all.actionHeatmap) : null;
+  shiftedResultAnalyze.activity.post.actionHeatmap = resultAnalyze.activity.post.actionHeatmap ? shiftHeatmap(resultAnalyze.activity.post.actionHeatmap) : null;
+  shiftedResultAnalyze.activity.like.actionHeatmap = resultAnalyze.activity.like.actionHeatmap ? shiftHeatmap(resultAnalyze.activity.like.actionHeatmap) : null;
+  shiftedResultAnalyze.activity.repost.actionHeatmap = resultAnalyze.activity.repost.actionHeatmap ? shiftHeatmap(resultAnalyze.activity.repost.actionHeatmap) : null;
+  shiftedResultAnalyze.activity.post.sentimentHeatmap = resultAnalyze.activity.post.sentimentHeatmap ? shiftHeatmap(resultAnalyze.activity.post.sentimentHeatmap) : null;
 
   return shiftedResultAnalyze;
 }

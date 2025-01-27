@@ -7,14 +7,7 @@
   // Chart.js のモジュールを登録
   Chart.register(...registerables);
 
-  export let influencer: number;
-  export let morningPerson: number;
-  export let nightOwl: number;
-  export let positivity: number;
-  export let postingFreq: number;
-  export let likingFreq: number;
-  export let repostFreq: number;
-  export let longpostFreq: number;
+  let {summary}: {summary: App.Summary} = $props()
 
   let chart: Chart | null = null;
 
@@ -39,14 +32,14 @@
             {
               label: 'User Profile',
               data: [
-                influencer,
-                morningPerson,
-                nightOwl,
-                positivity,
-                postingFreq,
-                likingFreq,
-                repostFreq,
-                longpostFreq,
+                summary.influencer,
+                summary.morningPerson,
+                summary.nightOwl,
+                summary.positivity,
+                summary.postingFreq,
+                summary.likingFreq,
+                summary.repostFreq,
+                summary.longpostFreq,
               ],
               backgroundColor: 'rgba(54, 162, 235, 0.2)',
               borderColor: 'rgba(54, 162, 235, 1)',
@@ -57,7 +50,7 @@
         },
         options: {
           responsive: true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,
           plugins: {
             legend: {
               display: false,
@@ -84,7 +77,7 @@
   });
 </script>
 
-<div class="w-full h-full">
+<div class="w-full h-48 md:h-96">
   <canvas id="radarChart"></canvas>
 </div>
 

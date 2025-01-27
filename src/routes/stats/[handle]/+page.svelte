@@ -6,7 +6,7 @@
   import LineGraph from '$lib/components/stats/LineGraph.svelte';
   import BarGraph from '$lib/components/stats/BarGraph.svelte';
   import Profile from '$lib/components/stats/Profile.svelte';
-  import type { AppBskyActorProfile } from '@atproto/api';
+  import type { ProfileViewDetailed } from '@atproto/api/dist/client/types/app/bsky/actor/defs';
   import IcSharpShare from '$lib/components/icons/IcSharpShare.svelte';
   import { Spinner } from 'flowbite-svelte';
   import { shiftHeatmapInResultAnalyze } from '$lib/components/stats/shiftHeatmapByTimezone';
@@ -24,8 +24,9 @@
 
   let handle: string = $state("");
   let resultAnalyze: App.ResultAnalyze | null = $state(null);
+  let summary: App.Summary = $state({} as App.Summary);
   let percentiles: App.Percentiles = $state({} as App.Percentiles);
-  let profile: App.ProfileExt = $state({} as App.ProfileExt);
+  let profile: ProfileViewDetailed = $state({} as ProfileViewDetailed);
   let error: string | null = $state(null);
 
   // ------------------------
@@ -39,6 +40,8 @@
       if (res.ok) {
         const data = await res.json();
         resultAnalyze = shiftHeatmapInResultAnalyze(data.resultAnalyze); // タイムゾーン変換
+        console.log(resultAnalyze)
+        summary = data.summary;
         percentiles = data.percentiles;
         profile = data.profile;
       } else {
@@ -103,20 +106,20 @@
     <!-- Profile -->
     <Profile
       {profile}
-      activityHeatmap={resultAnalyze.activity.all.actionHeatmap}
-      sentimentHeatmap={resultAnalyze.activity.post.sentimentHeatmap}
-      {percentiles}
+      {summary}
     />
 
     <!-- Recent Friends -->
     <div>
       <h3 class="text-2xl font-semibold text-gray-800 mb-4">Relationship</h3>
-      <CardWide
-        id="recentfriends"
-        title="Recent Friends"
-        recentFriends={resultAnalyze.relationship}
-        wordFreqMap={undefined}
-      />
+      {#if resultAnalyze.relationship}
+        <CardWide
+          id="recentfriends"
+          title="Recent Friends"
+          recentFriends={resultAnalyze.relationship}
+          wordFreqMap={undefined}
+        />
+      {/if}
     </div>
 
     <!-- all activity -->
@@ -136,11 +139,13 @@
           content: resultAnalyze.activity.all.lastAt,
         },
       ]} />
-      <BarGraph
-        postData={resultAnalyze.activity.post.actionHeatmap}
-        likeData={resultAnalyze.activity.like.actionHeatmap}
-        repostData={resultAnalyze.activity.repost.actionHeatmap}
-      />
+      {#if resultAnalyze.activity.post.actionHeatmap && resultAnalyze.activity.like.actionHeatmap && resultAnalyze.activity.repost.actionHeatmap}
+        <BarGraph
+          postData={resultAnalyze.activity.post.actionHeatmap}
+          likeData={resultAnalyze.activity.like.actionHeatmap}
+          repostData={resultAnalyze.activity.repost.actionHeatmap}
+        />
+      {/if}
     </div>
     
     <!-- Post Activity -->
@@ -179,7 +184,9 @@
         />
       {/if}
       
-      <LineGraph data={resultAnalyze.activity.post.sentimentHeatmap} centerZero={true} />
+      {#if resultAnalyze.activity.post.sentimentHeatmap}
+        <LineGraph data={resultAnalyze.activity.post.sentimentHeatmap} centerZero={true} />
+      {/if}
     </div>
 
     <!-- Like Activity -->

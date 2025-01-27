@@ -1,15 +1,17 @@
 import { PUBLIC_NODE_ENV } from '$env/static/public';
 import SessionManager from '$lib/server/bluesky/sessionManager';
 import { transformAppToDb, transformDbToApp } from '$lib/server/core/transformType';
-import { getPercentilesForProperties, getRecordsAndAnalyze, propertyNames, upsertRecords } from '$lib/server/inngest/functions';
+import { getPercentilesForProperties, getRecordsAndAnalyze, upsertRecords } from '$lib/server/inngest/functions';
 import { supabase } from '$lib/server/supabase';
 import type { RequestHandler } from '@sveltejs/kit';
 import { inngest } from '$lib/server/inngest';
+import { calculateSummary } from '$lib/server/core/calcurateSummary';
 
 const sessionManager = SessionManager.getInstance();
 
 export const GET: RequestHandler = async ({ params }) => {
   const { handle } = params;
+  let isInvisible = false;
 
   if (!handle) {
     return new Response(JSON.stringify({ error: 'Invalid Handle' }), { status: 400 });
@@ -26,6 +28,9 @@ export const GET: RequestHandler = async ({ params }) => {
 
     if (!success || !profile) {
       throw new Error('User Not found in Bluesky'); // Blueskyに存在しない場合
+    }
+    if (profile.labels?.find(label => label.val === "!no-unauthenticated")) {
+      isInvisible = true; // logged-out visibilityの設定を取得
     }
     const did = profile.did;
 
@@ -46,6 +51,9 @@ export const GET: RequestHandler = async ({ params }) => {
         data.percentiles = await doTmpUpsertAndGetPercentile(handle, did);
       }
 
+      // サマリ取得
+      const summary = calculateSummary(profile, resultAnalyze, data.percentiles);
+
       // バックグラウンド処理
       if (isUpdatedWithinAnHour(data.updated_at) && PUBLIC_NODE_ENV !== "development") {
         console.log(`[INFO] skip background process: ${handle}`);
@@ -53,7 +61,12 @@ export const GET: RequestHandler = async ({ params }) => {
         await inngest.send({ name: "analyze/existing-user", data: { handle, did } });
       }
 
-      return new Response(JSON.stringify({ resultAnalyze, percentiles: data.percentiles, profile }), { status: 200 });
+      // BG処理開始後、データフィルタ処理
+      if (isInvisible) {
+        filterResultAnalyze(resultAnalyze);
+      }
+
+      return new Response(JSON.stringify({ resultAnalyze, summary, percentiles: data.percentiles, profile }), { status: 200 });
     } else {
       // DBに存在しない: 新規ユーザ
       console.log(`[INFO] new user! : ${handle}`);
@@ -62,10 +75,18 @@ export const GET: RequestHandler = async ({ params }) => {
       // percentileがないのは見栄えが悪いので時間がかかっても取得
       const percentiles = await doTmpUpsertAndGetPercentile(handle, did);
 
+      // サマリ取得
+      const summary = calculateSummary(profile, newResultAnalyze, percentiles);
+      
       // バックグラウンド処理
       await inngest.send({ name: "analyze/new-user", data: { handle, newResultAnalyze } });
 
-      return new Response(JSON.stringify({ resultAnalyze: newResultAnalyze, percentiles, profile }), { status: 200 });
+      // BG処理開始後、データフィルタ処理
+      if (isInvisible) {
+        filterResultAnalyze(newResultAnalyze);
+      }
+
+      return new Response(JSON.stringify({ resultAnalyze: newResultAnalyze, summary, percentiles, profile }), { status: 200 });
     }
 
   } catch (err: any) {
@@ -90,7 +111,17 @@ function isUpdatedWithinAnHour(updatedAt: string | Date): boolean {
 async function doTmpUpsertAndGetPercentile(handle: string, did: string) {
   const tmpResultAnalyze = await getRecordsAndAnalyze(handle, did, 100);
   await upsertRecords(handle, tmpResultAnalyze, null);
-  const percentiles = await getPercentilesForProperties(handle, propertyNames);
+  const percentiles = await getPercentilesForProperties(handle);
 
   return percentiles;
+}
+
+function filterResultAnalyze(resultAnalyze: App.ResultAnalyze) {
+  resultAnalyze.activity.all.actionHeatmap = null;
+  resultAnalyze.activity.post.actionHeatmap = null;
+  resultAnalyze.activity.post.sentimentHeatmap = null;
+  resultAnalyze.activity.post.wordFreqMap = null;
+  resultAnalyze.activity.like.actionHeatmap = null;
+  resultAnalyze.activity.repost.actionHeatmap = null;
+  resultAnalyze.relationship = null;
 }

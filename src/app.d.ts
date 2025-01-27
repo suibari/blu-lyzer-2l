@@ -22,39 +22,34 @@ declare global {
 			},
 		}
 
-		interface ProfileExt extends AppBskyActorProfile.Record {
-			followsCount?: number;
-			followersCount?: number;
-		}
-
 		// My-App
 		export interface ResultAnalyze {
 			activity: {
 				all: {
 					averageInterval: number|null;
-					actionHeatmap: number[];
+					actionHeatmap: number[]|null;
 					lastAt: string|null;
 				};
 				post: {
 					averageInterval: number|null;
 					averageLength: number|null;
 					wordFreqMap: wordFreq[]|null;
-					actionHeatmap: number[];
-					sentimentHeatmap: number[];
+					actionHeatmap: number[]|null;
+					sentimentHeatmap: number[]|null;
 					lastAt: string|null;
 				};
 				like: {
 					averageInterval: number|null;
-					actionHeatmap: number[];
+					actionHeatmap: number[]|null;
 					lastAt: string|null;
 				};
 				repost: {
 					averageInterval: number|null;
-					actionHeatmap: number[];
+					actionHeatmap: number[]|null;
 					lastAt: string|null;
 				};
 			};
-			relationship: RecentFriend[];
+			relationship: RecentFriend[]|null;
 			updatedAt: string;
 		}
 		
@@ -100,8 +95,8 @@ declare global {
 			averageInterval: number;
 			averagePostsInterval: number;
 			averageTextLength: number;
-			averageLikeInterval?: number;
-			averageRepostInterval?: number;
+			averageLikeInterval: number;
+			averageRepostInterval: number;
 		}
 
 		export type CardType = "interval" | "length" | "date";
@@ -109,5 +104,16 @@ declare global {
 		interface Locals {
 			userLocale: string;
 		}
+
+		export interface Summary {
+			influencer: number;
+			morningPerson: number;
+			nightOwl: number;
+			positivity: number;
+			postingFreq: number;
+			likingFreq: number;
+			repostFreq: number;
+			longpostFreq: number;
+		};
 	}
 }

@@ -1,27 +1,9 @@
 <script lang="ts">
   import RadarGraph from "./RadarGraph.svelte";
   import Nickname from "./Nickname.svelte"; // 横長のコンポーネントをインポート
-  import {
-    calculateInfluencer,
-    calculateMorningPerson,
-    calculateNightPerson,
-    calculatePercentileToPoint,
-    calculateSentimentTotal,
-  } from "./calcurateProfile";
+  import type { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 
-  export let profile: App.ProfileExt;
-  export let activityHeatmap: number[];
-  export let sentimentHeatmap: number[];
-  export let percentiles: App.Percentiles;
-
-  const influencer = calculateInfluencer(profile.followsCount, profile.followersCount);
-  const morningPerson = calculateMorningPerson(activityHeatmap);
-  const nightOwl = calculateNightPerson(activityHeatmap);
-  const positivity = calculateSentimentTotal(sentimentHeatmap);
-  const postingFreq = calculatePercentileToPoint(percentiles.averagePostsInterval);
-  const likingFreq = calculatePercentileToPoint(percentiles.averageLikeInterval || 0);
-  const repostFreq = calculatePercentileToPoint(percentiles.averageRepostInterval || 0);
-  const longpostFreq = calculatePercentileToPoint(percentiles.averageTextLength);
+  let {profile, summary}: {profile: ProfileViewDetailed, summary: App.Summary} = $props();
 </script>
 
 <div class="w-full mx-auto p-6 bg-white shadow-lg rounded-lg">
@@ -45,18 +27,9 @@
     <!-- Right side: Radar Chart -->
     <div class="w-full md:w-1/2 mt-4 md:mt-0 md:pl-8">
       <div class="w-full h-full border border-gray-300 rounded-lg">
-        {#if profile && activityHeatmap && sentimentHeatmap && percentiles}
-          <RadarGraph
-            {influencer}
-            {morningPerson}
-            {nightOwl}
-            {positivity}
-            {postingFreq}
-            {likingFreq}
-            {repostFreq}
-            {longpostFreq}
-          />
-        {/if}
+        <RadarGraph
+          {summary}
+        />
       </div>
     </div>
   </div>
@@ -64,14 +37,7 @@
   <!-- Bottom Section: Simple Ranking -->
   <div class="w-full mt-6">
     <Nickname
-      {influencer}
-      {morningPerson}
-      {nightOwl}
-      {positivity}
-      {postingFreq}
-      {likingFreq}
-      {repostFreq}
-      {longpostFreq}
+      {summary}
     />
   </div>
 </div>

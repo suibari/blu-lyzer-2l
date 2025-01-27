@@ -1,5 +1,5 @@
 import { Inngest } from "inngest";
-import { getPercentilesForProperties, getRecordsAndAnalyze, propertyNames, upsertRecords } from "./functions";
+import { getPercentilesForProperties, getRecordsAndAnalyze, upsertRecords } from "./functions";
 
 export const inngest = new Inngest({ id: "blu-lyzer" });
 
@@ -11,7 +11,7 @@ export const doAnalyzeAndUpsertExistingUser = inngest.createFunction(
     const did = event.data.did;
     console.log(`[INFO][INNGEST] start background process: ${handle}`);
     const newResultAnalyze = await getRecordsAndAnalyze(handle, did, 500);
-    const percentiles = await getPercentilesForProperties(handle, propertyNames);
+    const percentiles = await getPercentilesForProperties(handle);
     await upsertRecords(handle, newResultAnalyze, percentiles);
   }
 )
@@ -23,7 +23,7 @@ export const doAnalyzeAndUpsertNewUser = inngest.createFunction(
     const handle = event.data.handle
     const newResultAnalyze = event.data.newResultAnalyze;
     console.log(`[INFO][INNGEST] start background process: ${handle}`);
-    const percentiles = await getPercentilesForProperties(handle, propertyNames);
+    const percentiles = await getPercentilesForProperties(handle);
     await upsertRecords(handle, newResultAnalyze, percentiles);
   }
 )

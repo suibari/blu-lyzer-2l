@@ -1,4 +1,19 @@
-export function calculateInfluencer(followsCount: number | undefined, followersCount: number | undefined): number {
+import type { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
+
+export function calculateSummary(profile: ProfileViewDetailed, resultAnalyze: App.ResultAnalyze, percentiles: App.Percentiles): App.Summary {
+  return {
+    influencer: calculateInfluencer(profile.followsCount, profile.followersCount),
+    morningPerson: calculateMorningPerson(resultAnalyze.activity.all.actionHeatmap || Array(24)),
+    nightOwl: calculateNightPerson(resultAnalyze.activity.all.actionHeatmap || Array(24)),
+    positivity: calculateSentimentTotal(resultAnalyze.activity.post.sentimentHeatmap || Array(24)),
+    postingFreq: calculatePercentileToPoint(percentiles.averagePostsInterval),
+    likingFreq: calculatePercentileToPoint(percentiles.averageLikeInterval || 0),
+    repostFreq: calculatePercentileToPoint(percentiles.averageRepostInterval || 0),
+    longpostFreq: calculatePercentileToPoint(percentiles.averageTextLength),
+  }
+}
+
+function calculateInfluencer(followsCount: number | undefined, followersCount: number | undefined): number {
   const follows = followsCount ? followsCount : 0;
   const followers = followersCount ? followersCount : 0;
 
@@ -20,7 +35,7 @@ export function calculateInfluencer(followsCount: number | undefined, followersC
  * @param activityInterval - 時間ごとのアクティビティデータ（24要素の配列）
  * @returns 朝型スコア (0~100)
  */
-export function calculateMorningPerson(activityInterval: number[]): number {
+function calculateMorningPerson(activityInterval: number[]): number {
   if (activityInterval.length !== 24) {
     throw new Error("activityInterval must contain exactly 24 elements.");
   }
@@ -39,7 +54,7 @@ export function calculateMorningPerson(activityInterval: number[]): number {
  * @param activityInterval - 時間ごとのアクティビティデータ（24要素の配列）
  * @returns 夜型スコア (0~100)
  */
-export function calculateNightPerson(activityInterval: number[]): number {
+function calculateNightPerson(activityInterval: number[]): number {
   if (activityInterval.length !== 24) {
     throw new Error("activityInterval must contain exactly 24 elements.");
   }
@@ -53,7 +68,7 @@ export function calculateNightPerson(activityInterval: number[]): number {
   return Math.round((nightSum / total) * 100);
 }
 
-export function calculateSentimentTotal(sentimentHeatmap: number[]): number {
+function calculateSentimentTotal(sentimentHeatmap: number[]): number {
   if (sentimentHeatmap.length !== 24) {
     throw new Error("sentimentHeatmap must contain exactly 24 elements.");
   }
@@ -64,6 +79,6 @@ export function calculateSentimentTotal(sentimentHeatmap: number[]): number {
   return (sentimentSumConv > 100) ? 100 : (sentimentSumConv < 0) ? 0 : sentimentSumConv;
 }
 
-export function calculatePercentileToPoint(percentile: number | null): number {
+function calculatePercentileToPoint(percentile: number | null): number {
   return (percentile === null || percentile === 0) ? 0 : 100 - percentile;
 }

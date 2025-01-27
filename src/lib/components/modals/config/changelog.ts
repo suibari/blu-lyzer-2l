@@ -1,5 +1,13 @@
 export const changelog = [
   {
+    "version": "v0.3.4",
+    "date": "2025/1/28",
+    "changes": [
+      "Logged-out Visibilityが非表示の場合、最近の友達、よく使う言葉、ヒートマップ系が非表示になるよう暫定措置",
+      "(認証を行えば自分だけは閲覧できるよう、近日中機能追加を予定)",
+    ]
+  },
+  {
     "version": "v0.3.3",
     "date": "2025/1/27",
     "changes": [
