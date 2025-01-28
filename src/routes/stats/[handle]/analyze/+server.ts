@@ -6,10 +6,11 @@ import { supabase } from '$lib/server/supabase';
 import type { RequestHandler } from '@sveltejs/kit';
 import { inngest } from '$lib/server/inngest';
 import { calculateSummary } from '$lib/server/core/calcurateSummary';
+import { shiftHeatmapInResultAnalyze } from '$lib/server/core/shiftHeatmapByTimezone';
 
 const sessionManager = SessionManager.getInstance();
 
-export const GET: RequestHandler = async ({ params }) => {
+export const POST: RequestHandler = async ({ params, request }) => {
   const { handle } = params;
   let isInvisible = false;
 
@@ -51,22 +52,35 @@ export const GET: RequestHandler = async ({ params }) => {
         data.percentiles = await doTmpUpsertAndGetPercentile(handle, did);
       }
 
+      // タイムゾーン変換
+      const { timeZone } = await request.json();
+      const shiftedResultAnalyze = shiftHeatmapInResultAnalyze(resultAnalyze, timeZone);
+
       // サマリ取得
-      const summary = calculateSummary(profile, resultAnalyze, data.percentiles);
+      const summary = calculateSummary(profile, shiftedResultAnalyze, data.percentiles);
 
       // バックグラウンド処理
       if (isUpdatedWithinAnHour(data.updated_at) && PUBLIC_NODE_ENV !== "development") {
         console.log(`[INFO] skip background process: ${handle}`);
       } else {
-        await inngest.send({ name: "analyze/existing-user", data: { handle, did } });
+        await inngest.send({
+          name: "analyze/existing-user",
+          data: { handle, did }
+        });
       }
 
       // BG処理開始後、データフィルタ処理
       if (isInvisible) {
-        filterResultAnalyze(resultAnalyze);
+        filterResultAnalyze(shiftedResultAnalyze);
       }
 
-      return new Response(JSON.stringify({ resultAnalyze, summary, percentiles: data.percentiles, profile }), { status: 200 });
+      return new Response(JSON.stringify({
+        resultAnalyze: shiftedResultAnalyze,
+        summary,
+        percentiles: data.percentiles,
+        profile
+      }), { status: 200 });
+
     } else {
       // DBに存在しない: 新規ユーザ
       console.log(`[INFO] new user! : ${handle}`);
@@ -75,18 +89,33 @@ export const GET: RequestHandler = async ({ params }) => {
       // percentileがないのは見栄えが悪いので時間がかかっても取得
       const percentiles = await doTmpUpsertAndGetPercentile(handle, did);
 
+      // タイムゾーン変換
+      const { timeZone } = await request.json();
+      const shiftedResultAnalyze = shiftHeatmapInResultAnalyze(newResultAnalyze, timeZone);
+
       // サマリ取得
-      const summary = calculateSummary(profile, newResultAnalyze, percentiles);
+      const summary = calculateSummary(profile, shiftedResultAnalyze, percentiles);
       
       // バックグラウンド処理
-      await inngest.send({ name: "analyze/new-user", data: { handle, newResultAnalyze } });
+      await inngest.send({
+        name: "analyze/new-user",
+        data: {
+          handle,
+          newResultAnalyze: shiftedResultAnalyze
+        }
+      });
 
       // BG処理開始後、データフィルタ処理
       if (isInvisible) {
-        filterResultAnalyze(newResultAnalyze);
+        filterResultAnalyze(shiftedResultAnalyze);
       }
 
-      return new Response(JSON.stringify({ resultAnalyze: newResultAnalyze, summary, percentiles, profile }), { status: 200 });
+      return new Response(JSON.stringify({
+        resultAnalyze: shiftedResultAnalyze,
+        summary,
+        percentiles,
+        profile
+      }), { status: 200 });
     }
 
   } catch (err: any) {

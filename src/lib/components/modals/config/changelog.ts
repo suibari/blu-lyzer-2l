@@ -1,5 +1,12 @@
 export const changelog = [
   {
+    "version": "v0.3.5",
+    "date": "2025/1/28",
+    "changes": [
+      "日本以外で朝型/夜型の計算がずれていたのを修正",
+    ]
+  },
+  {
     "version": "v0.3.4",
     "date": "2025/1/28",
     "changes": [

@@ -9,7 +9,6 @@
   import type { ProfileViewDetailed } from '@atproto/api/dist/client/types/app/bsky/actor/defs';
   import IcSharpShare from '$lib/components/icons/IcSharpShare.svelte';
   import { Spinner } from 'flowbite-svelte';
-  import { shiftHeatmapInResultAnalyze } from '$lib/components/stats/shiftHeatmapByTimezone';
   import { t } from '$lib/translations/translations';
   import type { PageProps } from './$types';
 
@@ -36,10 +35,17 @@
 
   onMount(async () => {
     try {
-      const res = await fetch(`/stats/${handle}/analyze`);
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const res = await fetch(`/stats/${handle}/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({timeZone})
+      });
       if (res.ok) {
         const data = await res.json();
-        resultAnalyze = shiftHeatmapInResultAnalyze(data.resultAnalyze); // タイムゾーン変換
+        resultAnalyze = data.resultAnalyze;
         summary = data.summary;
         percentiles = data.percentiles;
         profile = data.profile;
