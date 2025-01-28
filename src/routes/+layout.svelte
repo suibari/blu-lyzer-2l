@@ -4,22 +4,24 @@
   import ChangeLog from "$lib/components/modals/ChangeLog.svelte";
   import Login from "$lib/components/modals/Login.svelte";
   import "../app.css";
-  import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, FooterIcon, Tooltip } from 'flowbite-svelte';
+  import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
 
-  export let data: {session: App.IronSessionBsky | null};
+  export let data: { session: App.IronSessionBsky | null };
+
+  // ローカルで管理するセッション状態
+  let session = data.session;
 
   export let loginModal = false;
   export let aboutModal = false;
   export let changeLogModal = false;
 
   const handleLogout = async () => {
-    const res = await fetch('/logout', { method: 'POST' });  // ログアウト処理のAPIを呼び出し
+    const res = await fetch('/api/logout', { method: 'POST' });
     if (res.ok) {
-      // ログアウトが成功した場合の処理（必要に応じてリダイレクトや状態管理）
-      // isLoggedOut = true;
-      // window.location.href = '/';  // ログアウト後のリダイレクト先
+      console.log("logout complete");
+      session = null; // セッションをクリアしてログアウト状態を反映
     } else {
-      console.error('Logout failed');
+      console.error("Logout failed");
     }
   };
 </script>
@@ -31,7 +33,7 @@
     </NavBrand>
     <NavHamburger />
     <NavUl>
-      {#if data.session}
+      {#if session}
         <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => handleLogout()}>Logout</NavLi>
       {:else}
         <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => loginModal = true}>Login</NavLi>
