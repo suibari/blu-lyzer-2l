@@ -1,5 +1,7 @@
 import type { AppBskyActorProfile } from "@atproto/api";
 import type { Record } from '@atproto/api/dist/client/types/com/atproto/repo/listRecords';
+import type { NodeSavedSession } from "@atproto/oauth-client-node";
+import type { IronSession } from "iron-session";
 
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
@@ -103,6 +105,7 @@ declare global {
 
 		interface Locals {
 			userLocale: string;
+			session: NodeSavedSession | null;
 		}
 
 		export interface Summary {
@@ -114,6 +117,12 @@ declare global {
 			likingFreq: number;
 			repostFreq: number;
 			longpostFreq: number;
+		};
+
+		export interface IronSessionBsky extends IronSession {
+			did: string;
+			save: () => Promise<void>;
+			destroy: () => void;
 		};
 	}
 }

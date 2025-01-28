@@ -2,12 +2,15 @@ import { loadTranslations } from '../lib/translations/translations';
 import type { LayoutLoad } from './$types';
 
 export const load: LayoutLoad = async ({ data }) => {
-  const { userLocale } = data;
+  const { userLocale, session } = data;
 
-  // `translations` フォルダに `en.json` や `ja.json` を用意する
+  // --------------------
+  // sveltekit-i18n
+  // --------------------
   await loadTranslations(userLocale, '/');
 
   return {
-    userLocale
+    userLocale,
+    session
   };
 };
