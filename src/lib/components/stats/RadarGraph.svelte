@@ -21,7 +21,6 @@
           labels: [
             $t('stats.radar_influencer'),
             $t('stats.radar_morning_person'),
-            $t('stats.radar_night_owl'),
             $t('stats.radar_positivity'),
             $t('stats.radar_posting_freq'),
             $t('stats.radar_liking_freq'),
@@ -35,7 +34,6 @@
               data: [
                 summary.influencer,
                 summary.morningPerson,
-                summary.nightOwl,
                 summary.positivity,
                 summary.postingFreq,
                 summary.likingFreq,

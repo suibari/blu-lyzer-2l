@@ -73,7 +73,6 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         resultAnalyze = mergedResultAnalyze;
         data.percentiles = percentiles;
       }
-      console.log(data.percentiles);
 
       // タイムゾーン変換
       const { timeZone } = await request.json();
