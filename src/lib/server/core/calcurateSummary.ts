@@ -4,7 +4,6 @@ export function calculateSummary(profile: ProfileViewDetailed, resultAnalyze: Ap
   return {
     influencer: calculateInfluencer(profile.followsCount, profile.followersCount),
     morningPerson: calculateMorningPerson(resultAnalyze.activity.all.actionHeatmap || Array(24)),
-    nightOwl: calculateNightPerson(resultAnalyze.activity.all.actionHeatmap || Array(24)),
     positivity: calculateSentimentTotal(resultAnalyze.activity.post.sentimentHeatmap || Array(24)),
     postingFreq: calculatePercentileToPoint(percentiles.averagePostsInterval),
     likingFreq: calculatePercentileToPoint(percentiles.averageLikeInterval || 0),

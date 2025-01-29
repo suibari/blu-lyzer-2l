@@ -123,7 +123,6 @@ declare global {
 		export interface Summary {
 			influencer: number;
 			morningPerson: number;
-			nightOwl: number;
 			positivity: number;
 			postingFreq: number;
 			likingFreq: number;
