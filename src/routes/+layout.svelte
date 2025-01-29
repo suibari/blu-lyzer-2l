@@ -34,12 +34,12 @@
     <NavHamburger />
     <NavUl>
       {#if session}
-        <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => handleLogout()}>Logout</NavLi>
+        <NavLi class="md:text-gray-100 sm:text-primary-900 cursor-pointer" on:click={() => handleLogout()}>Logout</NavLi>
       {:else}
-        <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => loginModal = true}>Login</NavLi>
+        <NavLi class="md:text-gray-100 sm:text-primary-900 cursor-pointer" on:click={() => loginModal = true}>Login</NavLi>
       {/if}
-      <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => aboutModal = true}>About</NavLi>
-      <NavLi class="md:text-gray-100 sm:text-primary-900" on:click={() => changeLogModal = true}>ChangeLog</NavLi>
+      <NavLi class="md:text-gray-100 sm:text-primary-900 cursor-pointer" on:click={() => aboutModal = true}>About</NavLi>
+      <NavLi class="md:text-gray-100 sm:text-primary-900 cursor-pointer" on:click={() => changeLogModal = true}>ChangeLog</NavLi>
     </NavUl>
   </Navbar>
   

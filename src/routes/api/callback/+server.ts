@@ -2,6 +2,7 @@ import { getIronSession, type IronSession } from 'iron-session';
 import { COOKIE_SECRET } from '$env/static/private'; // 環境変数をインポート
 import { createClient } from '$lib/server/bluesky/sessionManagerOAuth'; // OAuthクライアントをインポート
 const client = await createClient();
+import { Agent } from '@atproto/api';
 
 export async function GET({ url, request }) {
   const response = new Response();
@@ -22,11 +23,15 @@ export async function GET({ url, request }) {
     clientSession.did = session.sub; // セッションにdidを保存
     await clientSession.save(); // セッションを保存
 
+    // didからハンドルを解決
+    const agent = new Agent(session);
+    const {data} = await agent.getProfile({actor: session.did});
+
     const cokkie = response.headers.get('set-cookie') || "";
     return new Response(null, {
       status: 302,
       headers: {
-        'Location': '/',
+        'Location': `/stats/${data.handle}`,
         'Set-Cookie': cokkie // セッション情報を含むクッキーをレスポンスに設定
       }
     });

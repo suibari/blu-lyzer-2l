@@ -7,7 +7,7 @@ export async function POST({ request }) {
     const { handle } = await request.json();
 
     const url = await client.authorize(handle, {
-      scope: 'atproto',
+      scope: 'atproto transition:generic',
     });
 
     // 成功した場合、Responseオブジェクトを返す

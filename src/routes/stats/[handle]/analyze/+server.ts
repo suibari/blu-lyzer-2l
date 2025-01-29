@@ -10,7 +10,7 @@ import { shiftHeatmapInResultAnalyze } from '$lib/server/core/shiftHeatmapByTime
 
 const sessionManager = SessionManager.getInstance();
 
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params, request, locals }) => {
   const { handle } = params;
   let isInvisible = false;
 
@@ -30,10 +30,16 @@ export const POST: RequestHandler = async ({ params, request }) => {
     if (!success || !profile) {
       throw new Error('User Not found in Bluesky'); // Blueskyに存在しない場合
     }
-    if (profile.labels?.find(label => label.val === "!no-unauthenticated")) {
-      isInvisible = true; // logged-out visibilityの設定を取得
-    }
     const did = profile.did;
+
+    // アクセス判定
+    if (locals.session) {
+      // 認証済みユーザ
+      isInvisible = false;
+    } else if (profile.labels?.find(label => label.val === "!no-unauthenticated")) {
+      // 未認証Invisibleユーザ
+      isInvisible = true;
+    } // それ以外:未認証Visibleユーザ
 
     // 既存ユーザ or 新規ユーザ
     const { data } = await supabase
