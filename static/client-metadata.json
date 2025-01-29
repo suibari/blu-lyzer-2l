@@ -1,0 +1,15 @@
+{
+  "client_id": "https://blu-lyzer.suibari.com//client-metadata.json",
+  "client_name": "Blu-lyzer",
+  "client_uri": "https://blu-lyzer.suibari.com/",
+  "logo_uri": "https://blu-lyzer.suibari.com/",
+  "tos_uri": "https://blu-lyzer.suibari.com/",
+  "policy_uri": "https://blu-lyzer.suibari.com/",
+  "redirect_uris": ["https://blu-lyzer.suibari.com/api/callback"],
+  "scope": "atproto transition:generic",
+  "grant_types": ["authorization_code", "refresh_token"],
+  "response_types": ["code"],
+  "token_endpoint_auth_method": "none",
+  "application_type": "web",
+  "dpop_bound_access_tokens": true
+}
