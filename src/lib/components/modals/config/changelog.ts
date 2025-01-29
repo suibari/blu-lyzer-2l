@@ -1,5 +1,13 @@
 export const changelog = [
   {
+    "version": "v0.3.6",
+    "date": "2025/1/29",
+    "changes": [
+      "OAuthログイン機能実装",
+      "ログインすることで、Logged-out Visibilityが非表示設定でも、自分の全データを閲覧可能",
+    ]
+  },
+  {
     "version": "v0.3.5",
     "date": "2025/1/28",
     "changes": [

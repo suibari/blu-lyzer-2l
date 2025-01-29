@@ -1,5 +1,8 @@
 {
   "title_0": "Blu-lyzer is a Bluesky activity analysis tool.",
   "title_1": "No login or installation required.",
-  "title_2": "Let's enter your Bluesky handle!"
+  "title_2": "Let's enter your Bluesky handle!",
+  "login_0": "[Benefits of Logging In]",
+  "login_1": "By logging in, you can view all your personal data* on Blu-lyzer.",
+  "login_2": "* This includes recent friends, activity frequency and sentiment values by time, commonly used words, and more (see below image for reference)."
 }

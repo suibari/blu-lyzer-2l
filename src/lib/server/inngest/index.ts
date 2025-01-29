@@ -10,7 +10,7 @@ export const doAnalyzeAndUpsertExistingUser = inngest.createFunction(
     const handle = event.data.handle;
     const did = event.data.did;
     console.log(`[INFO][INNGEST] start background process: ${handle}`);
-    const newResultAnalyze = await getRecordsAndAnalyze(handle, did, 500);
+    const newResultAnalyze = await getRecordsAndAnalyze(handle, did, 1000);
     const percentiles = await getPercentilesForProperties(handle);
     await upsertRecords(handle, newResultAnalyze, percentiles);
   }

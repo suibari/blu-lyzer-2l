@@ -8,7 +8,7 @@
   import Profile from '$lib/components/stats/Profile.svelte';
   import type { ProfileViewDetailed } from '@atproto/api/dist/client/types/app/bsky/actor/defs';
   import IcSharpShare from '$lib/components/icons/IcSharpShare.svelte';
-  import { Spinner } from 'flowbite-svelte';
+  import Spinner from '$lib/components/Spinner.svelte';
   import { t } from '$lib/translations/translations';
   import type { PageProps } from './$types';
 
@@ -243,9 +243,7 @@
   </div>
 
 {:else}
-  <div class="flex items-center justify-center w-full min-h-[calc(100vh-150px)]">
-    <Spinner color="blue" size={12} class="text-center" />
-  </div>
+  <Spinner />
 {/if}
 
 <svelte:head>

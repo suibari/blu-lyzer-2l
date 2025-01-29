@@ -1,26 +1,29 @@
 <script lang="ts">
+    import ErrorAlert from "$lib/components/ErrorAlert.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import About from "$lib/components/modals/About.svelte";
   import ChangeLog from "$lib/components/modals/ChangeLog.svelte";
   import Login from "$lib/components/modals/Login.svelte";
   import "../app.css";
-  import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
+  import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Alert } from 'flowbite-svelte';
 
   export let data: { session: App.IronSessionBsky | null };
-
-  // ローカルで管理するセッション状態
-  let session = data.session;
 
   export let loginModal = false;
   export let aboutModal = false;
   export let changeLogModal = false;
 
+  // ローカルで管理するセッション状態
+  let session = data.session;
+  let isLogoutError = false;
+
   const handleLogout = async () => {
     const res = await fetch('/api/logout', { method: 'POST' });
     if (res.ok) {
-      console.log("logout complete");
-      session = null; // セッションをクリアしてログアウト状態を反映
+      // console.log("logout complete");
+      window.location.href = '/'; // トップページにリダイレクト
     } else {
+      isLogoutError = true;
       console.error("Logout failed");
     }
   };
@@ -53,3 +56,5 @@
 <Login bind:loginModal />
 <About bind:aboutModal />
 <ChangeLog bind:changeLogModal />
+
+<ErrorAlert flag={isLogoutError} errorMessage="Logout failed" />
