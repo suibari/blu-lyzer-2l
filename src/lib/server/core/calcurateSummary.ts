@@ -10,8 +10,13 @@ export function calculateSummary(profile: ProfileViewDetailed, resultAnalyze: Ap
     likingFreq: calculatePercentileToPoint(percentiles.averageLikeInterval || 0),
     repostFreq: calculatePercentileToPoint(percentiles.averageRepostInterval || 0),
     longpostFreq: calculatePercentileToPoint(percentiles.averageTextLength),
+    replyFreq: calculatePercentileToPoint(percentiles.averageReplyInterval),
   }
 }
+
+const HOUR_START_MORNING = 4;
+const HOUR_START_NIGHT = 13;
+const HOUR_END_NIGHT = 22;
 
 function calculateInfluencer(followsCount: number | undefined, followersCount: number | undefined): number {
   const follows = followsCount ? followsCount : 0;
@@ -40,8 +45,8 @@ function calculateMorningPerson(activityInterval: number[]): number {
     throw new Error("activityInterval must contain exactly 24 elements.");
   }
 
-  const morningSum = activityInterval.slice(0, 12).reduce((acc, curr) => acc + curr, 0); // 0時〜11時の合計
-  const nightSum = activityInterval.slice(12, 24).reduce((acc, curr) => acc + curr, 0); // 12時〜23時の合計
+  const morningSum = activityInterval.slice(HOUR_START_MORNING, HOUR_START_NIGHT).reduce((acc, curr) => acc + curr, 0);
+  const nightSum = activityInterval.slice(HOUR_START_NIGHT, HOUR_END_NIGHT).reduce((acc, curr) => acc + curr, 0);
 
   const total = morningSum + nightSum;
   if (total === 0) return 0; // アクティビティが全くない場合の処理
@@ -59,8 +64,8 @@ function calculateNightPerson(activityInterval: number[]): number {
     throw new Error("activityInterval must contain exactly 24 elements.");
   }
 
-  const morningSum = activityInterval.slice(0, 12).reduce((acc, curr) => acc + curr, 0); // 0時〜11時の合計
-  const nightSum = activityInterval.slice(12, 24).reduce((acc, curr) => acc + curr, 0); // 12時〜23時の合計
+  const morningSum = activityInterval.slice(HOUR_START_MORNING, HOUR_START_NIGHT).reduce((acc, curr) => acc + curr, 0);
+  const nightSum = activityInterval.slice(HOUR_START_NIGHT, HOUR_END_NIGHT).reduce((acc, curr) => acc + curr, 0);
 
   const total = morningSum + nightSum;
   if (total === 0) return 0; // アクティビティが全くない場合の処理

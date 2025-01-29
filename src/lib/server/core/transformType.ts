@@ -1,4 +1,4 @@
-export const transformDbToApp = (data: any, updated_at: string): App.ResultAnalyze => {
+export const transformDbToApp = (data: App.ResultAnalyzeDB, updated_at: string): App.ResultAnalyze => {
   return {
     activity: {
       all: {
@@ -13,15 +13,20 @@ export const transformDbToApp = (data: any, updated_at: string): App.ResultAnaly
         actionHeatmap: data.postHistgram || [],
         sentimentHeatmap: data.sentimentHeatmap || [],
         lastAt: data.lastPostTime || null,
+        reply: {
+          averageInterval: data.averageReplyInterval || undefined,
+          actionHeatmap: data.replyHistgram || undefined,
+          lastAt: data.lastReplyTime || undefined,
+        }
       },
       like: {
         averageInterval: data.averageLikeInterval || null,
-        actionHeatmap: data.likeHistgram || null,
+        actionHeatmap: data.likeHistgram || [],
         lastAt: data.lastLikeTime || null,
       },
       repost: {
         averageInterval: data.averageRepostInterval || null,
-        actionHeatmap: data.repostHistgram || null,
+        actionHeatmap: data.repostHistgram || [],
         lastAt: data.lastRepostTime || null,
       },
     },
@@ -30,7 +35,7 @@ export const transformDbToApp = (data: any, updated_at: string): App.ResultAnaly
   };
 }
 
-export const transformAppToDb = (resultAnalyze: App.ResultAnalyze): any => {
+export const transformAppToDb = (resultAnalyze: App.ResultAnalyze): App.ResultAnalyzeDB => {
   return {
     // all
     averageInterval: resultAnalyze.activity.all.averageInterval,
@@ -43,6 +48,10 @@ export const transformAppToDb = (resultAnalyze: App.ResultAnalyze): any => {
     postHistgram: resultAnalyze.activity.post.actionHeatmap,
     sentimentHeatmap: resultAnalyze.activity.post.sentimentHeatmap,
     lastPostTime: resultAnalyze.activity.post.lastAt,
+    // reply
+    averageReplyInterval: resultAnalyze.activity.post.reply.averageInterval || null,
+    replyHistgram: resultAnalyze.activity.post.reply.actionHeatmap || null,
+    lastReplyTime: resultAnalyze.activity.post.reply.lastAt || null,
     // like
     averageLikeInterval: resultAnalyze.activity.like.averageInterval,
     likeHistgram: resultAnalyze.activity.like.actionHeatmap,
@@ -53,7 +62,5 @@ export const transformAppToDb = (resultAnalyze: App.ResultAnalyze): any => {
     lastRepostTime: resultAnalyze.activity.repost.lastAt,
     // relationship
     recentFriends: resultAnalyze.relationship,
-    // updatedAt
-    updated_at: resultAnalyze.updatedAt,
   };
 };

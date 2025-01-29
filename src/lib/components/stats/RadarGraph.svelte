@@ -27,6 +27,7 @@
             $t('stats.radar_liking_freq'),
             $t('stats.radar_repost_freq'),
             $t('stats.radar_longpost_freq'),
+            $t('stats.radar_reply_freq'),
           ],
           datasets: [
             {
@@ -40,6 +41,7 @@
                 summary.likingFreq,
                 summary.repostFreq,
                 summary.longpostFreq,
+                summary.replyFreq,
               ],
               backgroundColor: 'rgba(54, 162, 235, 0.2)',
               borderColor: 'rgba(54, 162, 235, 1)',

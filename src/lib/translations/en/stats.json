@@ -9,6 +9,7 @@
   "radar_liking_freq": "Liking Freq",
   "radar_repost_freq": "Repost Freq",
   "radar_longpost_freq": "Long-Post Freq",
+  "radar_reply_freq": "Communication Freq",
   "recentfriends_info": "Number of replies and likes for the user's friends recently interacted with",
   "interval_info": "Average time interval of activity. The rank value indicates the percentage of Blu-lyzer users from the top.",
   "active_heatmap_info": "A heatmap showing when and what kind of activities occur most frequently",

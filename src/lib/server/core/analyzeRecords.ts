@@ -34,6 +34,11 @@ export async function analyzeRecords(did: string, records: RecordMap): Promise<A
         actionHeatmap: generateActiveHeatmap(records.posts),
         sentimentHeatmap: sentimentHeatmap,
         lastAt: getLastActionTime(records.posts),
+        reply: {
+          averageInterval: calculateAverageInterval(records.posts.filter(post => post.value.reply)),
+          actionHeatmap: generateActiveHeatmap(records.posts.filter(post => post.value.reply)),
+          lastAt: getLastActionTime(records.posts.filter(post => post.value.reply)),
+        }
       },
       like: {
         averageInterval: calculateAverageInterval(records.likes),

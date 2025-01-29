@@ -7,8 +7,19 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { inngest } from '$lib/server/inngest';
 import { calculateSummary } from '$lib/server/core/calcurateSummary';
 import { shiftHeatmapInResultAnalyze } from '$lib/server/core/shiftHeatmapByTimezone';
+import pkg from 'lodash';
+const { merge } = pkg;
 
 const sessionManager = SessionManager.getInstance();
+
+const requiredKeys: Array<keyof App.Percentiles> = [
+  "averageInterval",
+  "averagePostsInterval",
+  "averageTextLength",
+  "averageLikeInterval",
+  "averageRepostInterval",
+  "averageReplyInterval",
+];
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
   const { handle } = params;
@@ -49,14 +60,20 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       .single();
 
     if (data) {
+      // --------------------
       // DBに存在: 既存ユーザ
+      // --------------------
       console.log(`[INFO] existing user: ${handle}`);
-      const resultAnalyze = transformDbToApp(data.result_analyze, data.updated_at);
+      let resultAnalyze = transformDbToApp(data.result_analyze, data.updated_at);
 
-      // percentileがなかったら、反映まで2回更新が必要なのでここで表示させる
-      if (!data.percentiles) {
-        data.percentiles = await doTmpUpsertAndGetPercentile(handle, did);
+      // percentileのいずれかのメンバーがなかったら、反映まで2回更新が必要なのでここで表示させる
+      if (!isValidPercentiles(data.percentiles)) {
+        console.log(`[INFO] calculate percentile: ${handle}`);
+        const {percentiles, mergedResultAnalyze} = await doTmpUpsertAndGetPercentile(handle, did, resultAnalyze);
+        resultAnalyze = mergedResultAnalyze;
+        data.percentiles = percentiles;
       }
+      console.log(data.percentiles);
 
       // タイムゾーン変換
       const { timeZone } = await request.json();
@@ -88,16 +105,18 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       }), { status: 200 });
 
     } else {
+      // --------------------
       // DBに存在しない: 新規ユーザ
+      // --------------------
       console.log(`[INFO] new user! : ${handle}`);
-      const newResultAnalyze = await getRecordsAndAnalyze(handle, did, 100);
+      // const newResultAnalyze = await getRecordsAndAnalyze(handle, did, 100);
 
       // percentileがないのは見栄えが悪いので時間がかかっても取得
-      const percentiles = await doTmpUpsertAndGetPercentile(handle, did);
+      const {percentiles, mergedResultAnalyze} = await doTmpUpsertAndGetPercentile(handle, did, null);
 
       // タイムゾーン変換
       const { timeZone } = await request.json();
-      const shiftedResultAnalyze = shiftHeatmapInResultAnalyze(newResultAnalyze, timeZone);
+      const shiftedResultAnalyze = shiftHeatmapInResultAnalyze(mergedResultAnalyze, timeZone);
 
       // サマリ取得
       const summary = calculateSummary(profile, shiftedResultAnalyze, percentiles);
@@ -143,12 +162,16 @@ function isUpdatedWithinAnHour(updatedAt: string | Date): boolean {
   return updatedTimeUTC >= oneHourAgo;
 }
 
-async function doTmpUpsertAndGetPercentile(handle: string, did: string) {
+async function doTmpUpsertAndGetPercentile(handle: string, did: string, resultAnalyze: App.ResultAnalyze | null)  {
   const tmpResultAnalyze = await getRecordsAndAnalyze(handle, did, 100);
-  await upsertRecords(handle, tmpResultAnalyze, null);
+  
+  // 深くマージ（ネストされたオブジェクトも対象に）
+  const mergedResultAnalyze = merge({}, tmpResultAnalyze, resultAnalyze);
+
+  await upsertRecords(handle, mergedResultAnalyze, null);
   const percentiles = await getPercentilesForProperties(handle);
 
-  return percentiles;
+  return {percentiles, mergedResultAnalyze};
 }
 
 function filterResultAnalyze(resultAnalyze: App.ResultAnalyze) {
@@ -159,4 +182,8 @@ function filterResultAnalyze(resultAnalyze: App.ResultAnalyze) {
   resultAnalyze.activity.like.actionHeatmap = null;
   resultAnalyze.activity.repost.actionHeatmap = null;
   resultAnalyze.relationship = null;
+}
+
+function isValidPercentiles(obj: any): obj is App.Percentiles {
+  return obj && requiredKeys.every(key => key in obj && typeof obj[key] === "number");
 }

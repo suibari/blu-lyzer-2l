@@ -4,12 +4,13 @@ import { analyzeRecords } from "../core/analyzeRecords";
 import { transformAppToDb } from "../core/transformType";
 import { supabase } from "../supabase";
 
-const propertyNames = [
+const propertyNames: Array<keyof App.Percentiles> = [
   "averageInterval",
   "averagePostsInterval",
   "averageLikeInterval",
   "averageRepostInterval",
   "averageTextLength",
+  "averageReplyInterval",
 ];
 
 export async function getRecordsAndAnalyze (handle: string, did: string, limit: number): Promise<App.ResultAnalyze> {

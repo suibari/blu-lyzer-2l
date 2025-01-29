@@ -25,6 +25,10 @@ export function shiftHeatmapInResultAnalyze(resultAnalyze: App.ResultAnalyze, us
     ? shiftHeatmap(resultAnalyze.activity.post.sentimentHeatmap, userTimeZone)
     : null;
 
+  shiftedResultAnalyze.activity.post.reply.actionHeatmap = resultAnalyze.activity.post.reply.actionHeatmap
+    ? shiftHeatmap(resultAnalyze.activity.post.reply.actionHeatmap, userTimeZone)
+    : null;
+
   return shiftedResultAnalyze;
 }
 

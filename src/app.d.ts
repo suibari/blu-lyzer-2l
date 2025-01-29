@@ -39,6 +39,11 @@ declare global {
 					actionHeatmap: number[]|null;
 					sentimentHeatmap: number[]|null;
 					lastAt: string|null;
+					reply: {
+						averageInterval: number|null|undefined;
+						actionHeatmap: number[]|null|undefined;
+						lastAt: string|null|undefined;
+					}
 				};
 				like: {
 					averageInterval: number|null;
@@ -55,7 +60,7 @@ declare global {
 			updatedAt: string;
 		}
 		
-		export interface wordFreq {
+		export interface WordFreq {
 			noun: string;
 			count: number;
 			sentimentScoreSum: number;
@@ -73,24 +78,30 @@ declare global {
 		
 		export interface ResultAnalyzeDB {
 			// all
-			averageInterval: number;
-			activeHistgram: number[];
-			lastActionTime: string;
+			averageInterval: number|null;
+			activeHistgram: number[]|null;
+			lastActionTime: string|null;
 			// post
-			averagePostsInterval: number;
-			averageTextLength: number;
-			wordFreqMap: number[];
-			postHistgram?: number[];
-			sentimentHeatmap: number[];
-			lastPostTime?: string[];
+			averagePostsInterval: number|null;
+			averageTextLength: number|null;
+			wordFreqMap: App.WordFreq[]|null;
+			postHistgram: number[]|null;
+			sentimentHeatmap: number[]|null;
+			lastPostTime: string|null;
+			// reply
+			averageReplyInterval: number|null;
+			replyHistgram: number[]|null;
+			lastReplyTime: string|null;
 			// like
-			averageLikeInterval?: number;
-			lastLikeTime?: string[];
+			averageLikeInterval?: number|null;
+			likeHistgram: number[]|null;
+			lastLikeTime: string|null;
 			// repost
-			averageRepostInterval?: number;
-			lastRepostTime?: string[];
+			averageRepostInterval?: number|null;
+			repostHistgram: number[]|null;
+			lastRepostTime?: string|null;
 			// relationship
-			recentFriends: RecentFriend[];
+			recentFriends: RecentFriend[]|null;
 		}
 
 		export interface Percentiles {
@@ -99,6 +110,7 @@ declare global {
 			averageTextLength: number;
 			averageLikeInterval: number;
 			averageRepostInterval: number;
+			averageReplyInterval: number;
 		}
 
 		export type CardType = "interval" | "length" | "date";
@@ -117,6 +129,7 @@ declare global {
 			likingFreq: number;
 			repostFreq: number;
 			longpostFreq: number;
+			replyFreq: number;
 		};
 
 		export interface IronSessionBsky extends IronSession {

@@ -4,18 +4,7 @@
 
   let {summary}: {summary: App.Summary} = $props();
 
-  const stats = {
-    influencer: summary.influencer,
-    morningPerson: summary.morningPerson,
-    nightOwl: summary.nightOwl,
-    positivity: summary.positivity,
-    postingFreq: summary.postingFreq,
-    likingFreq: summary.likingFreq,
-    repostFreq: summary.repostFreq,
-    longpostFreq: summary.longpostFreq,
-  };
-
-  const sortedStats = Object.entries(stats).sort(([, a], [, b]) => b - a);
+  const sortedStats = Object.entries(summary).sort(([, a], [, b]) => b - a);
   const [mostSignificant, secondMostSignificant] = sortedStats;
 
   // 形容詞と名詞をランダムに取得
