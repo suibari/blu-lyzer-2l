@@ -6,7 +6,7 @@
   export let title: string;
   export let id: string;
   export let recentFriends: App.RecentFriend[] | undefined;
-  export let wordFreqMap: App.wordFreq[] | undefined;
+  export let wordFreqMap: App.WordFreq[] | undefined;
 </script>
 
 <div class="p-4 bg-white shadow rounded-lg">

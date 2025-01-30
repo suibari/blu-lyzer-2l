@@ -43,7 +43,7 @@
     <span id="randomAdjective" class="block sm:inline">{randomAdjective}</span>
     <span id="randomNounEmoji" class="block sm:inline">{randomNoun}{emoji}</span>
   </p>
-  <div class="w-full flex-col justify-center items-center">
+  <div class="w-full flex-col justify-center items-center text-sm">
     {#each goodPoints as point}
       <p class="text-green-500 font-semibold">{point}</p>
     {/each}

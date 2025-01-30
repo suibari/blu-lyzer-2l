@@ -58,6 +58,7 @@ declare global {
 			};
 			relationship: RecentFriend[]|null;
 			updatedAt: string;
+			handle?: string;
 		}
 		
 		export interface WordFreq {
@@ -74,6 +75,7 @@ declare global {
 			score: number;
 			replyCount?: number;
 			likeCount?: number;
+			resultAnalyze?: ResultAnalyze;
 		};
 		
 		export interface ResultAnalyzeDB {

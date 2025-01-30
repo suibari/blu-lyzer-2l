@@ -64,7 +64,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       // DBに存在: 既存ユーザ
       // --------------------
       console.log(`[INFO] existing user: ${handle}`);
-      let resultAnalyze = transformDbToApp(data.result_analyze, data.updated_at);
+      let resultAnalyze = transformDbToApp(handle, data.result_analyze, data.updated_at);
 
       // percentileのいずれかのメンバーがなかったら、反映まで2回更新が必要なのでここで表示させる
       if (!isValidPercentiles(data.percentiles)) {
@@ -80,6 +80,9 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 
       // サマリ取得
       const summary = calculateSummary(profile, shiftedResultAnalyze, data.percentiles);
+
+      // friendsの分析
+      await setResultAnalyzeFriends(shiftedResultAnalyze, timeZone);
 
       // バックグラウンド処理
       if (isUpdatedWithinAnHour(data.updated_at) && PUBLIC_NODE_ENV !== "development") {
@@ -101,7 +104,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         summary,
         percentiles: data.percentiles,
         profile,
-        isInvisible
+        isInvisible,
       }), { status: 200 });
 
     } else {
@@ -121,6 +124,9 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       // サマリ取得
       const summary = calculateSummary(profile, shiftedResultAnalyze, percentiles);
       
+      // friendsの分析
+      await setResultAnalyzeFriends(shiftedResultAnalyze, timeZone);
+
       // バックグラウンド処理
       await inngest.send({
         name: "analyze/new-user",
@@ -187,4 +193,26 @@ function filterResultAnalyze(resultAnalyze: App.ResultAnalyze) {
 
 function isValidPercentiles(obj: any): obj is App.Percentiles {
   return obj && requiredKeys.every(key => key in obj && typeof obj[key] === "number");
+}
+
+/**
+ * 自分のResultAnalyzeにFriendのResultAnalyzeをセット
+ * @param resultAnalyze 
+ * @param timeZone 
+ */
+async function setResultAnalyzeFriends(resultAnalyze: App.ResultAnalyze, timeZone: string) {
+  const handleFriends = (resultAnalyze.relationship ?? []).map(friend => friend.handle);
+
+  const { data } = await supabase
+    .from("records")
+    .select('result_analyze, percentiles, updated_at, handle') // handleを追加して照合を確実に
+    .in('handle', handleFriends);
+
+  for (const friendDb of data || []) {
+    const friend = resultAnalyze.relationship?.find(f => f.handle === friendDb.handle);
+    if (friend?.handle) {
+      const transformed = transformDbToApp(friend.handle, friendDb.result_analyze, friendDb.updated_at);
+      friend.resultAnalyze = shiftHeatmapInResultAnalyze(transformed, timeZone);
+    }
+  }
 }

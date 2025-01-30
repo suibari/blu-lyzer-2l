@@ -11,8 +11,9 @@
   import Spinner from '$lib/components/Spinner.svelte';
   import { t } from '$lib/translations/translations';
   import type { PageProps } from './$types';
-    import { Alert } from 'flowbite-svelte';
-    import IcBaselineInfo from '$lib/components/icons/IcBaselineInfo.svelte';
+  import { Alert } from 'flowbite-svelte';
+  import IcBaselineInfo from '$lib/components/icons/IcBaselineInfo.svelte';
+  import LineGraphMuitiData from '$lib/components/stats/LineGraphMuitiData.svelte';
 
   // for dynamic OGP
   let { data }: PageProps = $props();
@@ -23,6 +24,9 @@
   let ogUrl = $state(data?.meta.ogUrl);
   const title = `${displayName}${$t("stats.ogp_title")} | Blu-lyzer`;
 
+  let timeZone: string;
+
+  // fetch
   let handle: string = $state("");
   let resultAnalyze: App.ResultAnalyze | null = $state(null);
   let summary: App.Summary = $state({} as App.Summary);
@@ -32,13 +36,13 @@
   let error: string | null = $state(null);
 
   // ------------------------
-  // fetch
+  // fetch result summary
   // ------------------------
   $effect(() => {handle = page.params.handle});
 
   onMount(async () => {
     try {
-      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const res = await fetch(`/stats/${handle}/analyze`, {
         method: 'POST',
         headers: {
@@ -49,6 +53,7 @@
       if (res.ok) {
         const data = await res.json();
         resultAnalyze = data.resultAnalyze;
+        console.log(resultAnalyze?.relationship)
         summary = data.summary;
         percentiles = data.percentiles;
         profile = data.profile;
@@ -93,6 +98,31 @@
       window.open(intentUrl, "_blank");
     }
   };
+
+  // ------------------------
+  // Util
+  // ------------------------
+  function getPeakFriendsActivityHour(resultAnalyze: App.ResultAnalyze): number | null {
+    if (!resultAnalyze.relationship) return null;
+
+    // 各時間帯(0-23)の合計を格納する配列
+    const totalHeatmap = Array(24).fill(0);
+
+    // 各relationshipのactionHeatmapを合算
+    for (const friend of resultAnalyze.relationship) {
+      const heatmap = friend.resultAnalyze?.activity.all.actionHeatmap;
+      if (Array.isArray(heatmap) && heatmap.length === 24) {
+        for (let i = 0; i < 24; i++) {
+          totalHeatmap[i] += heatmap[i] ?? 0; // undefinedなら0を加算
+        }
+      }
+    }
+
+    // 最も多いアクションが発生したインデックス（時間帯）を求める
+    const maxIndex = totalHeatmap.indexOf(Math.max(...totalHeatmap));
+
+    return maxIndex; // 0〜23の値が返る（最もアクティブな時間）
+  }
 </script>
 
 {#if error}
@@ -118,13 +148,14 @@
       {summary}
     />
 
+    <!-- Invisible Alert -->
     {#if isInvisible}
       <div class="w-full">
         <Alert color="yellow">
           <div class="flex items-center">
-          <IcBaselineInfo class="mr-4 text-2xl" />
+          <IcBaselineInfo class="mr-4 text-xl w-12" />
           <div class="flex-col">
-            <p>Blueskyでログアウトユーザに対するデータ非表示を設定しているか、本人がログインしていないため、表示する分析データを制限します。</p>
+            <p>Blueskyでログアウトユーザに対するデータ非表示を設定しているか、本人がログインしていないため、表示する分析データを制限しています。</p>
             <p>全ての分析データを見たい場合は、この設定を解除するか、本人の場合は上部メニューからログインしてください。</p>
           </div>
           </div>
@@ -136,12 +167,19 @@
     <div>
       {#if resultAnalyze.relationship}
         <h3 class="text-2xl font-semibold text-gray-800 mb-4">Relationship</h3>
-          <CardWide
-            id="recentfriends"
-            title="Recent Friends"
-            recentFriends={resultAnalyze.relationship}
-            wordFreqMap={undefined}
-          />
+        <CardWide
+          id="recentfriends"
+          title="Recent Friends"
+          recentFriends={resultAnalyze.relationship}
+          wordFreqMap={undefined}
+        />
+        <LineGraphMuitiData
+          datasets={resultAnalyze.relationship.slice(0, 10).map((friend, index) => ({
+            data: friend.resultAnalyze?.activity.all.actionHeatmap || Array(24),
+            label: friend.displayName || `No Name` // 名前がない場合のデフォルト
+          })).filter(dataset => dataset.data)}
+          peakActivityHour={getPeakFriendsActivityHour(resultAnalyze)}
+        />
       {/if}
     </div>
 

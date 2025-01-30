@@ -1,4 +1,4 @@
-export const transformDbToApp = (data: App.ResultAnalyzeDB, updated_at: string): App.ResultAnalyze => {
+export const transformDbToApp = (handle: string, data: App.ResultAnalyzeDB, updated_at: string): App.ResultAnalyze => {
   return {
     activity: {
       all: {
@@ -32,6 +32,7 @@ export const transformDbToApp = (data: App.ResultAnalyzeDB, updated_at: string):
     },
     relationship: data.recentFriends || [],
     updatedAt: updated_at,
+    handle: handle,
   };
 }
 
