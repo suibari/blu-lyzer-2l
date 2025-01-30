@@ -11,6 +11,8 @@
   import Spinner from '$lib/components/Spinner.svelte';
   import { t } from '$lib/translations/translations';
   import type { PageProps } from './$types';
+    import { Alert } from 'flowbite-svelte';
+    import IcBaselineInfo from '$lib/components/icons/IcBaselineInfo.svelte';
 
   // for dynamic OGP
   let { data }: PageProps = $props();
@@ -26,6 +28,7 @@
   let summary: App.Summary = $state({} as App.Summary);
   let percentiles: App.Percentiles = $state({} as App.Percentiles);
   let profile: ProfileViewDetailed = $state({} as ProfileViewDetailed);
+  let isInvisible: boolean = $state(false);
   let error: string | null = $state(null);
 
   // ------------------------
@@ -49,6 +52,7 @@
         summary = data.summary;
         percentiles = data.percentiles;
         profile = data.profile;
+        isInvisible = data.isInvisible;
       } else {
         const errorData = await res.json();  // エラーメッセージを取得
         error = `Error fetching data: ${errorData.message || errorData.error || 'Unknown error'}`;
@@ -114,16 +118,30 @@
       {summary}
     />
 
+    {#if isInvisible}
+      <div class="w-full">
+        <Alert color="yellow">
+          <div class="flex items-center">
+          <IcBaselineInfo class="mr-4 text-2xl" />
+          <div class="flex-col">
+            <p>Blueskyでログアウトユーザに対するデータ非表示を設定しているか、本人がログインしていないため、表示する分析データを制限します。</p>
+            <p>全ての分析データを見たい場合は、この設定を解除するか、本人の場合は上部メニューからログインしてください。</p>
+          </div>
+          </div>
+        </Alert>
+      </div>
+    {/if}
+
     <!-- Recent Friends -->
     <div>
-      <h3 class="text-2xl font-semibold text-gray-800 mb-4">Relationship</h3>
       {#if resultAnalyze.relationship}
-        <CardWide
-          id="recentfriends"
-          title="Recent Friends"
-          recentFriends={resultAnalyze.relationship}
-          wordFreqMap={undefined}
-        />
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Relationship</h3>
+          <CardWide
+            id="recentfriends"
+            title="Recent Friends"
+            recentFriends={resultAnalyze.relationship}
+            wordFreqMap={undefined}
+          />
       {/if}
     </div>
 

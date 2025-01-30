@@ -2,7 +2,7 @@ import { getNounFrequencies } from "./getNounFrequencies";
 import { getWordFrequencyEn } from "./getWordFrequencyEn";
 
 export async function analyzePosts(posts: App.RecordExt[]) {
-  const combinedWordFreqMap: Record<string, App.wordFreq> = {};
+  const combinedWordFreqMap: Record<string, App.WordFreq> = {};
   const sentimentHeatmap = new Array(24).fill(0);
 
   // jaポストが一つでも含まれているか確認

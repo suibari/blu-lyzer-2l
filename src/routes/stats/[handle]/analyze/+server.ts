@@ -100,7 +100,8 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         resultAnalyze: shiftedResultAnalyze,
         summary,
         percentiles: data.percentiles,
-        profile
+        profile,
+        isInvisible
       }), { status: 200 });
 
     } else {
@@ -138,7 +139,8 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         resultAnalyze: shiftedResultAnalyze,
         summary,
         percentiles,
-        profile
+        profile,
+        isInvisible
       }), { status: 200 });
     }
 

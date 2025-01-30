@@ -20,10 +20,10 @@ readFileSync(dictionaryPath, 'utf-8')
   });
 
 export async function getWordFrequencyEn(posts: App.RecordExt[]): Promise<{
-  wordFreqMap: App.wordFreq[];
+  wordFreqMap: App.WordFreq[];
   sentimentHeatmap: number[];
 }> {
-  const wordFreqMap: App.wordFreq[] = [];
+  const wordFreqMap: App.WordFreq[] = [];
   const sentimentHeatmap = new Array(24).fill(0);
 
   if (!posts.length) {

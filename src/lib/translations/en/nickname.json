@@ -28,5 +28,25 @@
     "likingFreq": "💝",
     "repostFreq": "📰",
     "longpostFreq": "🧐"
+  },
+  "goodpoint": {
+    "influencer": "You are a celebrity on Bluesky!",
+    "morningPerson": "You maintain a healthy, morning-oriented lifestyle.",
+    "positivity": "Your posts are bright and full of energy!",
+    "postingFreq": "You post frequently and keep everyone engaged.",
+    "likingFreq": "You give a lot of likes and uplift others.",
+    "repostFreq": "You repost a lot and help share valuable information.",
+    "longpostFreq": "You write long posts and organize your thoughts well.",
+    "replyFreq": "You reply a lot and build deeper connections with others."
+  },
+  "weakpoint": {
+    "influencer": "Trying new things might add some excitement to your life.",
+    "morningPerson": "Getting enough sleep could make you even healthier.",
+    "positivity": "Using more positive words could uplift both yourself and those around you.",
+    "postingFreq": "Posting more could help you organize your thoughts better.",
+    "likingFreq": "Liking more posts could help you discover new connections.",
+    "repostFreq": "Reposting more could help spread topics you find interesting.",
+    "longpostFreq": "Writing longer posts might help you structure your thoughts more clearly.",
+    "replyFreq": "Replying to more people could help deepen your relationships."
   }
 }

@@ -17,5 +17,7 @@
   "wordfreq_info": "Frequently posted words",
   "ogp_title": "'s Analyze Result",
   "nickname_title": "You are the ...",
-  "nickname_info": "A title that expresses the user. Based on the contents of the radar chart"
+  "nickname_info": "A title that expresses the user. Based on the contents of the radar chart",
+  "invisible_info_0": "Either Bluesky has restricted data visibility for logged-out users, or you are not logged in. As a result, access to analysis data is limited.",
+  "invisible_info_1": "To view all analysis data, please disable this setting or log in from the top menu if you are the account owner."
 }
