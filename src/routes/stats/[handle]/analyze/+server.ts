@@ -44,7 +44,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     const did = profile.did;
 
     // アクセス判定
-    if (locals.session) {
+    if (locals.session && locals.did === did) {
       // 認証済みユーザ
       configInvisible.allHeatmap = false;
       configInvisible.friendsHeatmap = false;

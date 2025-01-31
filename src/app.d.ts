@@ -120,6 +120,7 @@ declare global {
 		interface Locals {
 			userLocale: string;
 			session: NodeSavedSession | null;
+			did: string | null;
 		}
 
 		export interface Summary {

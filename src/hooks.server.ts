@@ -48,6 +48,7 @@ export const handle = sequence(
       } else {
         // session照合完了
         event.locals.session = sessionData;
+        event.locals.did = clientSession.did;
       }
     } else {
       event.locals.session = null;
