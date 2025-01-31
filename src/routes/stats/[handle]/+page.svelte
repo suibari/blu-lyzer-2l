@@ -32,7 +32,7 @@
   let summary: App.Summary = $state({} as App.Summary);
   let percentiles: App.Percentiles = $state({} as App.Percentiles);
   let profile: ProfileViewDetailed = $state({} as ProfileViewDetailed);
-  let isInvisible: boolean = $state(false);
+  let configInvisible: App.ConfigInvisible = $state({} as App.ConfigInvisible);
   let error: string | null = $state(null);
 
   // ------------------------
@@ -57,7 +57,7 @@
         summary = data.summary;
         percentiles = data.percentiles;
         profile = data.profile;
-        isInvisible = data.isInvisible;
+        configInvisible = data.configInvisible;
       } else {
         const errorData = await res.json();  // エラーメッセージを取得
         error = `Error fetching data: ${errorData.message || errorData.error || 'Unknown error'}`;
@@ -149,19 +149,32 @@
     />
 
     <!-- Invisible Alert -->
-    {#if isInvisible}
+    {#if configInvisible.allHeatmap}
       <div class="w-full">
         <Alert color="yellow">
           <div class="flex items-center">
           <IcBaselineInfo class="mr-4 text-xl w-12" />
           <div class="flex-col">
-            <p>Blueskyでログアウトユーザに対するデータ非表示を設定しているか、本人がログインしていないため、表示する分析データを制限しています。</p>
-            <p>全ての分析データを見たい場合は、この設定を解除するか、本人の場合は上部メニューからログインしてください。</p>
+            <p>{$t("stats.invisible_info_all_0")}</p>
+            <p>{$t("stats.invisible_info_all_1")}</p>
           </div>
           </div>
         </Alert>
       </div>
     {/if}
+    {#if configInvisible.friendsHeatmap}
+    <div class="w-full">
+      <Alert color="yellow">
+        <div class="flex items-center">
+        <IcBaselineInfo class="mr-4 text-xl w-12" />
+        <div class="flex-col">
+          <p>{$t("stats.invisible_info_friends_activity_0")}</p>
+          <p>{$t("stats.invisible_info_friends_activity_1")}</p>
+        </div>
+        </div>
+      </Alert>
+    </div>
+  {/if}
 
     <!-- Recent Friends -->
     <div>

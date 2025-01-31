@@ -75,7 +75,7 @@ declare global {
 			score: number;
 			replyCount?: number;
 			likeCount?: number;
-			resultAnalyze?: ResultAnalyze;
+			resultAnalyze?: ResultAnalyze|null;
 		};
 		
 		export interface ResultAnalyzeDB {
@@ -138,5 +138,10 @@ declare global {
 			save: () => Promise<void>;
 			destroy: () => void;
 		};
+
+		export interface ConfigInvisible {
+			allHeatmap: boolean;
+			friendsHeatmap: boolean;
+		}
 	}
 }

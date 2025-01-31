@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Chart } from 'chart.js/auto';
   import InfoWithTooltip from "../icons/InfoWithTooltip.svelte";
+  import { t } from '$lib/translations/translations';
 
   interface Dataset {
     label: string;
@@ -59,16 +60,16 @@
   <div class="p-4 bg-white shadow rounded-lg mt-4">
     <div class="flex items-center gap-2 mb-4">
       <h3 class="text-xl font-semibold text-gray-800">Friends Activity</h3>
-      <InfoWithTooltip id="sentimentHeatmap" key_i18n="stats.sentiment_heatmap_info" />
+      <InfoWithTooltip id="friendsActivityHeatmap" key_i18n="stats.friends_activity_info" />
     </div>
     <div class="relative w-full h-96">
-      <canvas id="lineChartFriends" use:chart={$state.snapshot({ datasets, peakActivityHour })}></canvas>
+      <canvas id="lineChartMulti" use:chart={$state.snapshot({ datasets, peakActivityHour })}></canvas>
     </div>
     {#if peakActivityHour}
       <div class="flex-col w-full mt-2 text-center text-l text-gray-900 space-y-1">
-        <p>友達の主な活動時間は</p>
-        <p class="font-semibold text-xl">{peakActivityHour-1}~{peakActivityHour+1}時</p>
-        <p>この時間にポストするといいかも!</p>
+        <p>{$t("stats.friends_activity_0")}</p>
+        <p class="font-semibold text-xl">{peakActivityHour-1}~{peakActivityHour+1}{$t("stats.friends_activity_1")}</p>
+        <p>{$t("stats.friends_activity_2")}</p>
       </div>
     {/if}
   </div>

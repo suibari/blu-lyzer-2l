@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let wordFreqMap: App.wordFreq[];
+  export let wordFreqMap: App.WordFreq[];
 </script>
 
 <div class="flex gap-4 overflow-x-auto">

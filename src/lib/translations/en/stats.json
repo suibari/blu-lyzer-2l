@@ -18,6 +18,12 @@
   "ogp_title": "'s Analyze Result",
   "nickname_title": "You are the ...",
   "nickname_info": "A title that expresses the user. Based on the contents of the radar chart",
-  "invisible_info_0": "Either Bluesky has restricted data visibility for logged-out users, or you are not logged in. As a result, access to analysis data is limited.",
-  "invisible_info_1": "To view all analysis data, please disable this setting or log in from the top menu if you are the account owner."
+  "invisible_info_all_0": "Either Bluesky has restricted data visibility for logged-out users, or you are not logged in. As a result, access to analysis data is limited.",
+  "invisible_info_all_1": "To view all analytics data, please disable this setting or log in from the top menu.",
+  "invisible_info_friends_activity_0": "Since you are not logged into Blu-lyzer, data related to your friends' active hours is restricted.",
+  "invisible_info_friends_activity_1": "To view all analytics data, please log in from the top menu.",
+  "friends_activity_info": "Friend's active hours. You can toggle the display by selecting the legend.",
+  "friends_activity_0": "Your friend's main active hours are",
+  "friends_activity_1": "o'clock.",
+  "friends_activity_2": "Let's post during this time might be a good idea!"
 }

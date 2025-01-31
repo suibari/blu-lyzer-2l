@@ -23,7 +23,7 @@ const requiredKeys: Array<keyof App.Percentiles> = [
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
   const { handle } = params;
-  let isInvisible = false;
+  let configInvisible: App.ConfigInvisible = {allHeatmap: false, friendsHeatmap: false};
 
   if (!handle) {
     return new Response(JSON.stringify({ error: 'Invalid Handle' }), { status: 400 });
@@ -46,11 +46,17 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     // アクセス判定
     if (locals.session) {
       // 認証済みユーザ
-      isInvisible = false;
+      configInvisible.allHeatmap = false;
+      configInvisible.friendsHeatmap = false;
     } else if (profile.labels?.find(label => label.val === "!no-unauthenticated")) {
       // 未認証Invisibleユーザ
-      isInvisible = true;
-    } // それ以外:未認証Visibleユーザ
+      configInvisible.allHeatmap = true;
+      configInvisible.friendsHeatmap = true;
+    } else {
+      // それ以外:未認証Visibleユーザ
+      configInvisible.allHeatmap = false;
+      configInvisible.friendsHeatmap = true;
+    }
 
     // 既存ユーザ or 新規ユーザ
     const { data } = await supabase
@@ -95,16 +101,14 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       }
 
       // BG処理開始後、データフィルタ処理
-      if (isInvisible) {
-        filterResultAnalyze(shiftedResultAnalyze);
-      }
-
+      filterResultAnalyze(shiftedResultAnalyze, configInvisible);
+      
       return new Response(JSON.stringify({
         resultAnalyze: shiftedResultAnalyze,
         summary,
         percentiles: data.percentiles,
         profile,
-        isInvisible,
+        configInvisible,
       }), { status: 200 });
 
     } else {
@@ -127,6 +131,9 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       // friendsの分析
       await setResultAnalyzeFriends(shiftedResultAnalyze, timeZone);
 
+      // friendsの分析
+      await setResultAnalyzeFriends(shiftedResultAnalyze, timeZone);
+
       // バックグラウンド処理
       await inngest.send({
         name: "analyze/new-user",
@@ -136,17 +143,12 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         }
       });
 
-      // BG処理開始後、データフィルタ処理
-      if (isInvisible) {
-        filterResultAnalyze(shiftedResultAnalyze);
-      }
-
       return new Response(JSON.stringify({
         resultAnalyze: shiftedResultAnalyze,
         summary,
         percentiles,
         profile,
-        isInvisible
+        configInvisible,
       }), { status: 200 });
     }
 
@@ -181,14 +183,21 @@ async function doTmpUpsertAndGetPercentile(handle: string, did: string, resultAn
   return {percentiles, mergedResultAnalyze};
 }
 
-function filterResultAnalyze(resultAnalyze: App.ResultAnalyze) {
-  resultAnalyze.activity.all.actionHeatmap = null;
-  resultAnalyze.activity.post.actionHeatmap = null;
-  resultAnalyze.activity.post.sentimentHeatmap = null;
-  resultAnalyze.activity.post.wordFreqMap = null;
-  resultAnalyze.activity.like.actionHeatmap = null;
-  resultAnalyze.activity.repost.actionHeatmap = null;
-  resultAnalyze.relationship = null;
+function filterResultAnalyze(resultAnalyze: App.ResultAnalyze, configInvisible: App.ConfigInvisible) {
+  if (configInvisible.friendsHeatmap) {
+    resultAnalyze.relationship?.forEach(friend => {
+      friend.resultAnalyze = null;
+    });
+  }
+  if (configInvisible.allHeatmap) {
+    resultAnalyze.activity.all.actionHeatmap = null;
+    resultAnalyze.activity.post.actionHeatmap = null;
+    resultAnalyze.activity.post.sentimentHeatmap = null;
+    resultAnalyze.activity.post.wordFreqMap = null;
+    resultAnalyze.activity.like.actionHeatmap = null;
+    resultAnalyze.activity.repost.actionHeatmap = null;
+    resultAnalyze.relationship = null;
+  }
 }
 
 function isValidPercentiles(obj: any): obj is App.Percentiles {
