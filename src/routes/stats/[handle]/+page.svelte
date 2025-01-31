@@ -14,6 +14,7 @@
   import { Alert } from 'flowbite-svelte';
   import IcBaselineInfo from '$lib/components/icons/IcBaselineInfo.svelte';
   import LineGraphMuitiData from '$lib/components/stats/LineGraphMuitiData.svelte';
+  import WordCloud from '$lib/components/stats/WordCloud.svelte';
 
   // for dynamic OGP
   let { data }: PageProps = $props();
@@ -123,6 +124,19 @@
 
     return maxIndex; // 0〜23の値が返る（最もアクティブな時間）
   }
+
+  const requiredKeys: Array<keyof App.Percentiles> = [
+    "averageInterval",
+    "averagePostsInterval",
+    "averageTextLength",
+    "averageLikeInterval",
+    "averageRepostInterval",
+    "averageReplyInterval",
+  ];
+
+  function isValidPercentiles(obj: any): obj is App.Percentiles {
+    return obj && requiredKeys.every(key => key in obj && typeof obj[key] === "number");
+  }
 </script>
 
 {#if error}
@@ -148,7 +162,7 @@
       {summary}
     />
 
-    <!-- Invisible Alert -->
+    <!-- Alert -->
     {#if configInvisible.allHeatmap}
       <div class="w-full">
         <Alert color="yellow">
@@ -170,6 +184,18 @@
         <div class="flex-col">
           <p>{$t("stats.invisible_info_friends_activity_0")}</p>
           <p>{$t("stats.invisible_info_friends_activity_1")}</p>
+        </div>
+        </div>
+      </Alert>
+    </div>
+  {/if}
+  {#if !isValidPercentiles(percentiles)}
+    <div class="w-full">
+      <Alert color="green">
+        <div class="flex items-center">
+        <IcBaselineInfo class="mr-4 text-xl w-12" />
+        <div class="flex-col">
+          <p>{$t("stats.percentiles_alert_0")}</p>
         </div>
         </div>
       </Alert>
@@ -216,6 +242,7 @@
       {#if resultAnalyze.activity.post.actionHeatmap && resultAnalyze.activity.like.actionHeatmap && resultAnalyze.activity.repost.actionHeatmap}
         <BarGraph
           postData={resultAnalyze.activity.post.actionHeatmap}
+          replyData={resultAnalyze.activity.post.reply.actionHeatmap || Array(24)}
           likeData={resultAnalyze.activity.like.actionHeatmap}
           repostData={resultAnalyze.activity.repost.actionHeatmap}
         />
@@ -249,6 +276,10 @@
         ]}
       />
       
+      {#if resultAnalyze.activity.post.sentimentHeatmap}
+        <LineGraph data={resultAnalyze.activity.post.sentimentHeatmap} centerZero={true} />
+      {/if}
+
       {#if resultAnalyze.activity.post.wordFreqMap && resultAnalyze.activity.post.wordFreqMap.length > 0}
         <CardWide
           id="wordfreq"
@@ -256,12 +287,32 @@
           recentFriends={undefined}
           wordFreqMap={resultAnalyze.activity.post.wordFreqMap}
         />
-      {/if}
-      
-      {#if resultAnalyze.activity.post.sentimentHeatmap}
-        <LineGraph data={resultAnalyze.activity.post.sentimentHeatmap} centerZero={true} />
+        <WordCloud wordFreqMap={resultAnalyze.activity.post.wordFreqMap} />
       {/if}
     </div>
+
+    <!-- Reply Activity -->
+    {#if resultAnalyze.activity.post.reply}
+      <div>
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Reply Activity</h3>
+        <CardGrid
+          cards={[
+            {
+              id: "avarageReplyInterval",
+              type: "interval",
+              title: 'Avg Interval',
+              content: resultAnalyze.activity.post.reply.averageInterval || null,
+              percentile: percentiles?.averageReplyInterval,
+            },
+            {
+              type: "date",
+              title: 'Last Activity',
+              content: resultAnalyze.activity.post.reply.lastAt || null
+            },
+          ]}
+        />
+      </div>
+    {/if}
 
     <!-- Like Activity -->
     <div>

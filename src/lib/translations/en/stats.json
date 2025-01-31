@@ -25,5 +25,7 @@
   "friends_activity_info": "Friend's active hours. You can toggle the display by selecting the legend.",
   "friends_activity_0": "Your friend's main active hours are",
   "friends_activity_1": "o'clock.",
-  "friends_activity_2": "Let's post during this time might be a good idea!"
+  "friends_activity_2": "Let's post during this time might be a good idea!",
+  "percentiles_alert_0": "If there are empty items in the radar chart, please try accessing it again about one minute after!",
+  "wordcloud_info": "A word cloud of frequently posted words. Green represents positive words, and red represents negative words."
 }

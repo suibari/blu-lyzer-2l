@@ -4,27 +4,37 @@
 
   interface Props {
     postData: number[];
+    replyData: number[];
     likeData: number[];
     repostData: number[];
   }
-  let {postData, likeData, repostData}: Props = $props();
+  let { postData, replyData, likeData, repostData }: Props = $props();
 
-  let chartData = $state({postData, likeData, repostData});
+  let chartData = $state({ postData, replyData, likeData, repostData });
 
   function chart(_p0: HTMLCanvasElement, datasets: Props) {
     let chartInstance: Chart;
     const node = document.getElementById('barChart') as HTMLCanvasElement;
 
     function createChart(datasets: Props) {
+      const postDataWithoutReplies = datasets.postData.map(
+        (value, index) => value - datasets.replyData[index]
+      ); // replyDataを減算したpostData
+
       chartInstance = new Chart(node, {
         type: "bar",
         data: {
           labels: datasets.postData.map((_, i) => `${i}:00`), // 時間ラベル
           datasets: [
             {
-              label: "Posts",
-              data: datasets.postData,
+              label: "Posts (Not Replies)",
+              data: postDataWithoutReplies,
               backgroundColor: "rgba(54, 162, 235, 0.6)", // 青
+            },
+            {
+              label: "Replies",
+              data: datasets.replyData,
+              backgroundColor: "rgba(255, 159, 64, 0.6)", // オレンジ
             },
             {
               label: "Likes",

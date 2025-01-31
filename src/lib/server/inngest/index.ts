@@ -11,7 +11,8 @@ export const doAnalyzeAndUpsertExistingUser = inngest.createFunction(
     const did = event.data.did;
     console.log(`[INFO][INNGEST] start background process: ${handle}`);
     const newResultAnalyze = await getRecordsAndAnalyze(handle, did, 1000);
-    const percentiles = await getPercentilesForProperties(handle);
+    await upsertRecords(handle, newResultAnalyze, null);
+    const percentiles = await getPercentilesForProperties(handle); // パーセンタイルを求めるためには2回DB操作が必要
     await upsertRecords(handle, newResultAnalyze, percentiles);
   }
 )

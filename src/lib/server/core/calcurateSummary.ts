@@ -5,11 +5,11 @@ export function calculateSummary(profile: ProfileViewDetailed, resultAnalyze: Ap
     influencer: calculateInfluencer(profile.followsCount, profile.followersCount),
     morningPerson: calculateMorningPerson(resultAnalyze.activity.all.actionHeatmap || Array(24)),
     positivity: calculateSentimentTotal(resultAnalyze.activity.post.sentimentHeatmap || Array(24)),
-    postingFreq: calculatePercentileToPoint(percentiles.averagePostsInterval),
-    likingFreq: calculatePercentileToPoint(percentiles.averageLikeInterval || 0),
-    repostFreq: calculatePercentileToPoint(percentiles.averageRepostInterval || 0),
-    longpostFreq: calculatePercentileToPoint(percentiles.averageTextLength),
-    replyFreq: calculatePercentileToPoint(percentiles.averageReplyInterval),
+    postingFreq: calculatePercentileToPoint(percentiles?.averagePostsInterval || 0),
+    likingFreq: calculatePercentileToPoint(percentiles?.averageLikeInterval || 0),
+    repostFreq: calculatePercentileToPoint(percentiles?.averageRepostInterval || 0),
+    longpostFreq: calculatePercentileToPoint(percentiles?.averageTextLength || 0),
+    replyFreq: calculatePercentileToPoint(percentiles?.averageReplyInterval || 0),
   }
 }
 

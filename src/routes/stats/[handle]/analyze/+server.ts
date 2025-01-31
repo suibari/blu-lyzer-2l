@@ -12,15 +12,6 @@ const { merge } = pkg;
 
 const sessionManager = SessionManager.getInstance();
 
-const requiredKeys: Array<keyof App.Percentiles> = [
-  "averageInterval",
-  "averagePostsInterval",
-  "averageTextLength",
-  "averageLikeInterval",
-  "averageRepostInterval",
-  "averageReplyInterval",
-];
-
 export const POST: RequestHandler = async ({ params, request, locals }) => {
   const { handle } = params;
   let configInvisible: App.ConfigInvisible = {allHeatmap: false, friendsHeatmap: false};
@@ -71,14 +62,6 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       // --------------------
       console.log(`[INFO] existing user: ${handle}`);
       let resultAnalyze = transformDbToApp(handle, data.result_analyze, data.updated_at);
-
-      // percentileのいずれかのメンバーがなかったら、反映まで2回更新が必要なのでここで表示させる
-      if (!isValidPercentiles(data.percentiles)) {
-        console.log(`[INFO] calculate percentile: ${handle}`);
-        const {percentiles, mergedResultAnalyze} = await doTmpUpsertAndGetPercentile(handle, did, resultAnalyze);
-        resultAnalyze = mergedResultAnalyze;
-        data.percentiles = percentiles;
-      }
 
       // タイムゾーン変換
       const { timeZone } = await request.json();
@@ -198,10 +181,6 @@ function filterResultAnalyze(resultAnalyze: App.ResultAnalyze, configInvisible: 
     resultAnalyze.activity.repost.actionHeatmap = null;
     resultAnalyze.relationship = null;
   }
-}
-
-function isValidPercentiles(obj: any): obj is App.Percentiles {
-  return obj && requiredKeys.every(key => key in obj && typeof obj[key] === "number");
 }
 
 /**

@@ -21,14 +21,21 @@ export async function getRecordsAndAnalyze (handle: string, did: string, limit: 
 }
 
 export async function upsertRecords (handle: string, resultAnalyze: App.ResultAnalyze, percentiles: App.Percentiles | null) {
+  const dataToUpsert: any = {
+    handle,
+    result_analyze: transformAppToDb(resultAnalyze),
+    updated_at: new Date().toISOString(),
+  };
+
+  // percentiles が null でない場合のみ upsert データに追加
+  if (percentiles !== null) {
+    dataToUpsert.percentiles = percentiles;
+  }
+
   await supabase
     .from("records")
-    .upsert([{
-      handle,
-      result_analyze: transformAppToDb(resultAnalyze),
-      percentiles,
-      updated_at: new Date().toISOString(),
-    }]);
+    .upsert([dataToUpsert]);
+
   console.log(`[INFO][INNGEST] updated result_analyze: ${handle}`);
 }
 
