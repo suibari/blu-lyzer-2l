@@ -13,7 +13,7 @@ export const doAnalyzeAndUpsertExistingUser = inngest.createFunction(
 
     const records = await step.run("fetch-records", async () => {
       const { getLatestRecords } = await import("../bluesky/getLatestRecords");
-      return await getLatestRecords(handle, did, 1000);
+      return await getLatestRecords(handle, did, 300);
     }) as import("../bluesky/getLatestRecords").RecordMap;
 
     const newResultAnalyze = await step.run("analyze-records", async () => {

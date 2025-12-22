@@ -1,5 +1,12 @@
 export const changelog = [
   {
+    "version": "v0.3.9",
+    "date": "2025/12/23",
+    "changes": [
+      "バックグラウンド更新がされない確率が高かったのを改善",
+    ]
+  },
+  {
     "version": "v0.3.8",
     "date": "2025/1/31",
     "changes": [
