@@ -11,8 +11,14 @@ export const doAnalyzeAndUpsertExistingUser = inngest.createFunction(
     const did = event.data.did;
     console.log(`[INFO][INNGEST] start background process: ${handle}`);
 
-    const newResultAnalyze = await step.run("get-records-and-analyze", async () => {
-      return await getRecordsAndAnalyze(handle, did, 1000);
+    const records = await step.run("fetch-records", async () => {
+      const { getLatestRecords } = await import("../bluesky/getLatestRecords");
+      return await getLatestRecords(handle, did, 1000);
+    }) as import("../bluesky/getLatestRecords").RecordMap;
+
+    const newResultAnalyze = await step.run("analyze-records", async () => {
+      const { analyzeRecords } = await import("../core/analyzeRecords");
+      return await analyzeRecords(did, records);
     }) as App.ResultAnalyze;
 
     await step.run("upsert-records-intermediate", async () => {
