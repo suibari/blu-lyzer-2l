@@ -13,14 +13,14 @@ const propertyNames: Array<keyof App.Percentiles> = [
   "averageReplyInterval",
 ];
 
-export async function getRecordsAndAnalyze (handle: string, did: string, limit: number): Promise<App.ResultAnalyze> {
+export async function getRecordsAndAnalyze(handle: string, did: string, limit: number): Promise<App.ResultAnalyze> {
   const records = await getLatestRecords(handle, did, limit);
   const resultAnalyze = await analyzeRecords(did, records);
   console.log(`[INFO][INNGEST] get result_analyze: ${handle}`);
   return resultAnalyze;
 }
 
-export async function upsertRecords (handle: string, resultAnalyze: App.ResultAnalyze, percentiles: App.Percentiles | null) {
+export async function upsertRecords(handle: string, resultAnalyze: App.ResultAnalyze, percentiles: App.Percentiles | null) {
   const dataToUpsert: any = {
     handle,
     result_analyze: transformAppToDb(resultAnalyze),
@@ -48,27 +48,30 @@ export async function upsertRecords (handle: string, resultAnalyze: App.ResultAn
 export async function getPercentilesForProperties(handle: string) {
   const percentiles: Record<string, { value: number } | null> = {};
 
-  // 各プロパティ名について順次RPCを実行
-  for (const propertyName of propertyNames) {
-    const rpcFuncName = (propertyName === "averageTextLength") ? "get_json_property_percentile" : "get_json_property_percentile_asc";
+  // Execute RPC calls in parallel
+  const results = await Promise.all(
+    propertyNames.map(async (propertyName) => {
+      const rpcFuncName = (propertyName === "averageTextLength") ? "get_json_property_percentile" : "get_json_property_percentile_asc";
 
-    const { data, error } = await supabase.rpc(rpcFuncName, {
-      target_handle: handle,
-      property_name: propertyName,
-    });
+      const { data, error } = await supabase.rpc(rpcFuncName, {
+        target_handle: handle,
+        property_name: propertyName,
+      });
 
-    if (error) {
-      console.error(`Error fetching percentile for property: ${propertyName}`, error);
-      percentiles[propertyName] = null;  // エラーが発生した場合はnullを設定
-      continue;
-    }
+      if (error) {
+        console.error(`Error fetching percentile for property: ${propertyName}`, error);
+        return { propertyName, value: null };
+      }
 
-    if (data) {
-      percentiles[propertyName] = data;
-    } else {
-      percentiles[propertyName] = null;  // データがなければnullを設定
-    }
-  }
+      return { propertyName, value: data ?? null };
+    })
+  );
+
+  // Map results back to the percentiles object
+  results.forEach(({ propertyName, value }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (percentiles as any)[propertyName] = value;
+  });
 
   return percentiles as unknown as App.Percentiles;
 }
