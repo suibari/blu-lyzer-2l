@@ -14,7 +14,7 @@ const propertyNames: Array<keyof App.Percentiles> = [
 ];
 
 export async function getRecordsAndAnalyze(handle: string, did: string, limit: number): Promise<App.ResultAnalyze> {
-  const records = await getLatestRecords(handle, did, limit);
+  const { records } = await getLatestRecords(handle, did, limit);
   const resultAnalyze = await analyzeRecords(did, records);
   console.log(`[INFO][INNGEST] get result_analyze: ${handle}`);
   return resultAnalyze;

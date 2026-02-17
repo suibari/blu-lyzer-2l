@@ -7,20 +7,34 @@ export type RecordMap = {
   repost: App.RecordExt[];
 };
 
+export type FetchResult = {
+  records: RecordMap;
+  cursors: {
+    posts?: string;
+    likes?: string;
+    reposts?: string;
+  };
+};
+
 /**
  * Get the latest posts, likes, and reposts for a given handle
  * @param handle The Bluesky handle of the user
- * @returns Promise<RecordMap> Containing posts, likes, and reposts
+ * @returns Promise<FetchResult> Containing posts, likes, reposts, and their next cursors
  */
-export async function getLatestRecords(handle: string, did: string, limit: number): Promise<RecordMap> {
+export async function getLatestRecords(
+  handle: string,
+  did: string,
+  limit: number,
+  cursors?: { posts?: string; likes?: string; reposts?: string }
+): Promise<FetchResult> {
 
   const pds = await getPdsDomain(did);
   const agent = new AtpAgent({ service: pds });
 
-  const fetchRecords = async (collection: string, limit: number): Promise<App.RecordExt[]> => {
+  const fetchRecords = async (collection: string, limit: number, initialCursor?: string): Promise<{ records: App.RecordExt[], cursor?: string }> => {
     try {
       let records: App.RecordExt[] = [];
-      let cursor: string | undefined = undefined;
+      let cursor: string | undefined = initialCursor;
 
       while (records.length < limit) {
         const response = await agent.com.atproto.repo.listRecords({
@@ -43,23 +57,30 @@ export async function getLatestRecords(handle: string, did: string, limit: numbe
         }
       }
 
-      return records;
+      return { records, cursor };
     } catch (e) {
       console.error(e);
       console.warn(`[WARN] Failed to fetch records for ${collection}, handle: ${handle}`);
-      return [];
+      return { records: [], cursor: undefined };
     }
   };
 
-  const [postRecords, likeRecords, repostRecords] = await Promise.all([
-    fetchRecords('app.bsky.feed.post', limit),
-    fetchRecords('app.bsky.feed.like', limit),
-    fetchRecords('app.bsky.feed.repost', limit),
+  const [postResult, likeResult, repostResult] = await Promise.all([
+    fetchRecords('app.bsky.feed.post', limit, cursors?.posts),
+    fetchRecords('app.bsky.feed.like', limit, cursors?.likes),
+    fetchRecords('app.bsky.feed.repost', limit, cursors?.reposts),
   ]);
 
   return {
-    posts: postRecords,
-    likes: likeRecords,
-    repost: repostRecords,
+    records: {
+      posts: postResult.records,
+      likes: likeResult.records,
+      repost: repostResult.records,
+    },
+    cursors: {
+      posts: postResult.cursor,
+      likes: likeResult.cursor,
+      reposts: repostResult.cursor,
+    }
   };
 }

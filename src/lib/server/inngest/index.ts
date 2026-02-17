@@ -11,10 +11,43 @@ export const doAnalyzeAndUpsertExistingUser = inngest.createFunction(
     const did = event.data.did;
     console.log(`[INFO][INNGEST] start background process: ${handle}`);
 
-    const records = await step.run("fetch-records", async () => {
-      const { getLatestRecords } = await import("../bluesky/getLatestRecords");
-      return await getLatestRecords(handle, did, 300);
-    }) as import("../bluesky/getLatestRecords").RecordMap;
+    // Re-writing the logic to properly use Inngest steps *outside* the inner function
+    // We need to construct the records by running multiple steps
+
+    // Initial state
+    let accumulatedRecords: import("../bluesky/getLatestRecords").RecordMap = {
+      posts: [],
+      likes: [],
+      repost: []
+    };
+
+    let cursors: { posts?: string; likes?: string; reposts?: string } | undefined = undefined;
+    const BATCH_SIZE = 200;
+    const TOTAL_LIMIT = 5000;
+    const MAX_LOOPS = Math.ceil(TOTAL_LIMIT / BATCH_SIZE);
+
+    for (let i = 0; i < MAX_LOOPS; i++) {
+      const result = await step.run(`fetch-records-${i}`, async () => {
+        const { getLatestRecords } = await import("../bluesky/getLatestRecords");
+        console.log(`[INFO][INNGEST] fetch-records-${i}`);
+        return await getLatestRecords(handle, did, BATCH_SIZE, cursors);
+      }) as import("../bluesky/getLatestRecords").FetchResult;
+
+      accumulatedRecords.posts = accumulatedRecords.posts.concat(result.records.posts);
+      accumulatedRecords.likes = accumulatedRecords.likes.concat(result.records.likes);
+      accumulatedRecords.repost = accumulatedRecords.repost.concat(result.records.repost);
+
+      cursors = result.cursors;
+
+      // If no more data in any category, we *could* break, but getLatestRecords handles empty cursors gracefully (returns empty list).
+      // Optimization: if all cursors are undefined, break.
+      if (!cursors.posts && !cursors.likes && !cursors.reposts) {
+        break;
+      }
+    }
+
+    // Assign to records for next steps
+    const records = accumulatedRecords;
 
     const newResultAnalyze = await step.run("analyze-records", async () => {
       const { analyzeRecords } = await import("../core/analyzeRecords");
