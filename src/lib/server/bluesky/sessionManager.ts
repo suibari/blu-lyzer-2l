@@ -1,6 +1,6 @@
 import { BSKY_IDENTIFIER, BSKY_APP_PASSWORD } from '$env/static/private';
 import { AtpAgent } from '@atproto/api';
-import { supabase } from '../supabase';
+import { db } from '../postgres';
 
 // Bluesky セッション管理クラス
 export default class SessionManager {
@@ -23,28 +23,25 @@ export default class SessionManager {
   }
 
   async createOrRefreshSession(): Promise<void> {
-    // Supabase からトークンを取得
-    const { data, error } = await supabase
-      .from('tokens')
-      .select('access_jwt')
-      .eq('handle', this.identifier)
-      .single();
-  
-    if (error) {
+    // DBからトークンを取得
+    let data;
+    try {
+      data = await db.getToken(this.identifier);
+    } catch (error: any) {
       console.warn(`[WARN] Error retrieving session for ${this.identifier}:`, error.message);
     }
-  
+
     if (!data || !data.access_jwt) {
       console.info(`[INFO] No valid session found. Creating a new session for ${this.identifier}.`);
       await this.createSession(); // 新しいセッションを作成
       return;
     }
-  
+
     const accessJwt = data.access_jwt;
-  
+
     // セッションを設定
     this.agent.setHeader('Authorization', `Bearer ${accessJwt}`);
-  
+
     try {
       // トークンの有効性を確認
       await this.agent.app.bsky.feed.getTimeline();
@@ -66,10 +63,7 @@ export default class SessionManager {
       password: this.password,
     });
 
-    await supabase
-      .from('tokens')
-      .upsert({ handle: this.identifier, access_jwt: response.data.accessJwt })
-      .eq('handle', this.identifier);
+    await db.upsertToken(this.identifier, { access_jwt: response.data.accessJwt });
 
     this.agent.setHeader('Authorization', `Bearer ${response.data.accessJwt}`);
     console.info('[INFO] Created a new session.');
@@ -81,10 +75,7 @@ export default class SessionManager {
       password: this.password,
     });
 
-    await supabase
-      .from('tokens')
-      .update({ access_jwt: response.data.accessJwt })
-      .eq('handle', this.identifier);
+    await db.updateToken(this.identifier, { access_jwt: response.data.accessJwt });
 
     this.agent.setHeader('Authorization', `Bearer ${response.data.accessJwt}`);
     console.info('[INFO] Refreshed the session.');

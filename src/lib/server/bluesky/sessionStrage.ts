@@ -1,5 +1,5 @@
 import type { NodeSavedSession, NodeSavedSessionStore, NodeSavedState, Session } from "@atproto/oauth-client-node";
-import { supabase } from "../supabase";
+import { db } from "../postgres";
 
 export class StateStore {
   store: Map<string, NodeSavedState>;
@@ -23,35 +23,28 @@ export class StateStore {
 
 export class SessionStore {
   async get(key: string): Promise<NodeSavedSession | undefined> {
-    const { data, error } = await supabase
-      .from('auth_session')
-      .select('*')
-      .eq('key', key)
-      .single();
-
-    if (error || !data) return undefined;
-
-    return JSON.parse(data.session);
+    try {
+      const data = await db.getSession(key);
+      if (!data) return undefined;
+      return JSON.parse(data.session);
+    } catch (error) {
+      return undefined;
+    }
   }
 
   async set(key: string, val: NodeSavedSession): Promise<void> {
     const session = JSON.stringify(val);
-    const { data, error } = await supabase
-      .from('auth_session')
-      .upsert({ key, session, updated_at: new Date() }, { onConflict: 'key' });
-
-    if (error) {
+    try {
+      await db.upsertSession(key, session);
+    } catch (error: any) {
       throw new Error(`Failed to set session: ${error.message}`);
     }
   }
 
   async del(key: string): Promise<void> {
-    const { error } = await supabase
-      .from('auth_session')
-      .delete()
-      .eq('key', key);
-
-    if (error) {
+    try {
+      await db.deleteSession(key);
+    } catch (error: any) {
       throw new Error(`Failed to delete session: ${error.message}`);
     }
   }

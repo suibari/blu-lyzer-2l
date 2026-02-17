@@ -2,7 +2,7 @@ import { PUBLIC_NODE_ENV } from '$env/static/public';
 import SessionManager from '$lib/server/bluesky/sessionManager';
 import { transformAppToDb, transformDbToApp } from '$lib/server/core/transformType';
 import { getPercentilesForProperties, getRecordsAndAnalyze, upsertRecords } from '$lib/server/inngest/functions';
-import { supabase } from '$lib/server/supabase';
+import { db } from '$lib/server/postgres';
 import type { RequestHandler } from '@sveltejs/kit';
 import { inngest } from '$lib/server/inngest';
 import { calculateSummary } from '$lib/server/core/calcurateSummary';
@@ -14,7 +14,7 @@ const sessionManager = SessionManager.getInstance();
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
   const { handle } = params;
-  let configInvisible: App.ConfigInvisible = {allHeatmap: false, friendsHeatmap: false};
+  let configInvisible: App.ConfigInvisible = { allHeatmap: false, friendsHeatmap: false };
 
   if (!handle) {
     return new Response(JSON.stringify({ error: 'Invalid Handle' }), { status: 400 });
@@ -50,11 +50,8 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     }
 
     // 既存ユーザ or 新規ユーザ
-    const { data } = await supabase
-      .from("records")
-      .select('result_analyze, percentiles, updated_at')
-      .eq('handle', handle)
-      .single();
+    // selectで必要なカラムを指定
+    const data = await db.getRecord(handle, 'result_analyze, percentiles, updated_at');
 
     if (data) {
       // --------------------
@@ -85,7 +82,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 
       // BG処理開始後、データフィルタ処理
       filterResultAnalyze(shiftedResultAnalyze, configInvisible);
-      
+
       return new Response(JSON.stringify({
         resultAnalyze: shiftedResultAnalyze,
         summary,
@@ -102,7 +99,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       // const newResultAnalyze = await getRecordsAndAnalyze(handle, did, 100);
 
       // percentileがないのは見栄えが悪いので時間がかかっても取得
-      const {percentiles, mergedResultAnalyze} = await doTmpUpsertAndGetPercentile(handle, did, null);
+      const { percentiles, mergedResultAnalyze } = await doTmpUpsertAndGetPercentile(handle, did, null);
 
       // タイムゾーン変換
       const { timeZone } = await request.json();
@@ -110,7 +107,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 
       // サマリ取得
       const summary = calculateSummary(profile, shiftedResultAnalyze, percentiles);
-      
+
       // friendsの分析
       await setResultAnalyzeFriends(shiftedResultAnalyze, timeZone);
 
@@ -154,16 +151,16 @@ function isUpdatedWithinAnHour(updatedAt: string | Date): boolean {
   return updatedTimeUTC >= oneHourAgo;
 }
 
-async function doTmpUpsertAndGetPercentile(handle: string, did: string, resultAnalyze: App.ResultAnalyze | null)  {
+async function doTmpUpsertAndGetPercentile(handle: string, did: string, resultAnalyze: App.ResultAnalyze | null) {
   const tmpResultAnalyze = await getRecordsAndAnalyze(handle, did, 100);
-  
+
   // 深くマージ（ネストされたオブジェクトも対象に）
   const mergedResultAnalyze = merge({}, tmpResultAnalyze, resultAnalyze);
 
   await upsertRecords(handle, mergedResultAnalyze, null);
   const percentiles = await getPercentilesForProperties(handle);
 
-  return {percentiles, mergedResultAnalyze};
+  return { percentiles, mergedResultAnalyze };
 }
 
 function filterResultAnalyze(resultAnalyze: App.ResultAnalyze, configInvisible: App.ConfigInvisible) {
@@ -189,12 +186,11 @@ function filterResultAnalyze(resultAnalyze: App.ResultAnalyze, configInvisible: 
  * @param timeZone 
  */
 async function setResultAnalyzeFriends(resultAnalyze: App.ResultAnalyze, timeZone: string) {
-  const handleFriends = (resultAnalyze.relationship ?? []).map(friend => friend.handle);
+  const handleFriends = (resultAnalyze.relationship ?? [])
+    .map(friend => friend.handle)
+    .filter((h): h is string => !!h);
 
-  const { data } = await supabase
-    .from("records")
-    .select('result_analyze, percentiles, updated_at, handle') // handleを追加して照合を確実に
-    .in('handle', handleFriends);
+  const data = await db.getRecordsByHandles(handleFriends, 'result_analyze, percentiles, updated_at, handle');
 
   for (const friendDb of data || []) {
     const friend = resultAnalyze.relationship?.find(f => f.handle === friendDb.handle);

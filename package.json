@@ -30,7 +30,6 @@
 	"dependencies": {
 		"@atproto/api": "^0.13.28",
 		"@atproto/oauth-client-node": "^0.2.8",
-		"@supabase/supabase-js": "^2.48.0",
 		"chart.js": "^4.4.7",
 		"date-fns": "^4.1.0",
 		"date-fns-tz": "^3.2.0",

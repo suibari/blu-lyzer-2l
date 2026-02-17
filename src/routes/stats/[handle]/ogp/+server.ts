@@ -1,7 +1,7 @@
 import SessionManager from '$lib/server/bluesky/sessionManager';
 import { transformAppToDb, transformDbToApp } from '$lib/server/core/transformType';
 import { getRecordsAndAnalyze } from '$lib/server/inngest/functions';
-import { supabase } from '$lib/server/supabase';
+import { db } from '$lib/server/postgres';
 import type { RequestHandler } from '@sveltejs/kit';
 
 const sessionManager = SessionManager.getInstance();
@@ -28,11 +28,7 @@ export const GET: RequestHandler = async ({ params }) => {
     const did = profile.did;
 
     // 既存ユーザ or 新規ユーザ
-    const { data } = await supabase
-      .from("records")
-      .select('result_analyze, updated_at')
-      .eq('handle', handle)
-      .single();
+    const data = await db.getRecord(handle, 'result_analyze, updated_at');
 
     if (data) {
       // DBに存在: 既存ユーザ

@@ -2,7 +2,7 @@ import { inngest } from ".";
 import { getLatestRecords } from "../bluesky/getLatestRecords";
 import { analyzeRecords } from "../core/analyzeRecords";
 import { transformAppToDb } from "../core/transformType";
-import { supabase } from "../supabase";
+import { db } from "../postgres";
 
 const propertyNames: Array<keyof App.Percentiles> = [
   "averageInterval",
@@ -32,9 +32,7 @@ export async function upsertRecords(handle: string, resultAnalyze: App.ResultAna
     dataToUpsert.percentiles = percentiles;
   }
 
-  await supabase
-    .from("records")
-    .upsert([dataToUpsert]);
+  await db.upsertRecords([dataToUpsert]);
 
   console.log(`[INFO][INNGEST] updated result_analyze: ${handle}`);
 }
@@ -53,17 +51,19 @@ export async function getPercentilesForProperties(handle: string) {
     propertyNames.map(async (propertyName) => {
       const rpcFuncName = (propertyName === "averageTextLength") ? "get_json_property_percentile" : "get_json_property_percentile_asc";
 
-      const { data, error } = await supabase.rpc(rpcFuncName, {
-        target_handle: handle,
-        property_name: propertyName,
-      });
+      try {
+        const data = await db.rpc(rpcFuncName, {
+          target_handle: handle,
+          property_name: propertyName,
+        });
 
-      if (error) {
+        return { propertyName, value: data ?? null };
+      } catch (error) {
         console.error(`Error fetching percentile for property: ${propertyName}`, error);
         return { propertyName, value: null };
       }
 
-      return { propertyName, value: data ?? null };
+
     })
   );
 
