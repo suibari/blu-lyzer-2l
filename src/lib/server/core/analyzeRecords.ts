@@ -14,11 +14,25 @@ export type RecordMap = {
 
 const sessionManager = SessionManager.getInstance();
 
-export async function analyzeRecords(did: string, records: RecordMap): Promise<App.ResultAnalyze> {
+export async function analyzeRecords(did: string, records: RecordMap, analyzedPostsData?: { wordFreqMap: App.WordFreq[], sentimentHeatmap: number[], sentimentHistory: Array<{ date: string, score: number }> }): Promise<App.ResultAnalyze> {
   const allRecords = collectAllRecords(records);
 
   // 頻出単語分析
-  const { wordFreqMap, sentimentHeatmap } = await analyzePosts(records.posts);
+  let wordFreqMap: App.WordFreq[] = [];
+  let sentimentHeatmap: number[] = [];
+  let sentimentHistory: Array<{ date: string, score: number }> = [];
+
+  if (analyzedPostsData) {
+    wordFreqMap = analyzedPostsData.wordFreqMap;
+    sentimentHeatmap = analyzedPostsData.sentimentHeatmap;
+    sentimentHistory = analyzedPostsData.sentimentHistory;
+  } else {
+    const result = await analyzePosts(records.posts);
+    wordFreqMap = result.wordFreqMap;
+    sentimentHeatmap = result.sentimentHeatmap;
+    sentimentHistory = result.sentimentHistory;
+  }
+  console.log(`[INFO][analyzeRecords] sentimentHistory length: ${sentimentHistory.length}`);
 
   return {
     activity: {
@@ -30,9 +44,11 @@ export async function analyzeRecords(did: string, records: RecordMap): Promise<A
       post: {
         averageInterval: calculateAverageInterval(records.posts),
         averageLength: calculateAverageTextLength(records.posts),
-        wordFreqMap: wordFreqMap,
+        wordFreqMap: wordFreqMap.slice(0, 100),
         actionHeatmap: generateActiveHeatmap(records.posts),
         sentimentHeatmap: sentimentHeatmap,
+        sentimentHistory: sentimentHistory,
+        sentimentCalendar: null,
         lastAt: getLastActionTime(records.posts),
         reply: {
           averageInterval: calculateAverageInterval(records.posts.filter(post => post.value.reply)),
@@ -114,7 +130,7 @@ async function getRecentFriends(did: string, posts: App.RecordExt[], likes: App.
   recentFriends = aggregateRecentFriends(didLike, recentFriends, SCORE_LIKE);
 
   // 自分を除外
-  const recentFriendsFiltered = recentFriends.filter(friend => friend.did !== did );
+  const recentFriendsFiltered = recentFriends.filter(friend => friend.did !== did);
 
   // getProfilesが25までなのでslice
   const recentFriendsSorted = sortRecentFriendsByScore(recentFriendsFiltered);
@@ -126,7 +142,7 @@ async function getRecentFriends(did: string, posts: App.RecordExt[], likes: App.
   if (actors.length > 0) {
     // await sessionManager.createOrRefreshSession();
     const agent = sessionManager.getAgent();
-    const {data} = await agent.getProfiles({actors});
+    const { data } = await agent.getProfiles({ actors });
     recentFriendsSliced.forEach(friend => {
       const matchProf = data.profiles.find(profile => profile.did === friend.did);
       if (matchProf) {
@@ -134,9 +150,9 @@ async function getRecentFriends(did: string, posts: App.RecordExt[], likes: App.
         friend.displayName = matchProf.displayName;
         friend.avator = matchProf.avatar;
       }
-    })  
+    })
   }
-  
+
   return recentFriendsSliced;
 }
 

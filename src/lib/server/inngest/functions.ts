@@ -32,6 +32,8 @@ export async function upsertRecords(handle: string, resultAnalyze: App.ResultAna
     dataToUpsert.percentiles = percentiles;
   }
 
+  console.log(`[INFO][INNGEST] upsertRecords handle: ${handle}, sentimentHistory len: ${resultAnalyze.activity.post.sentimentHistory?.length}`);
+
   await db.upsertRecords([dataToUpsert]);
 
   console.log(`[INFO][INNGEST] updated result_analyze: ${handle}`);

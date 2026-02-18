@@ -49,23 +49,91 @@ export const doAnalyzeAndUpsertExistingUser = inngest.createFunction(
     // Assign to records for next steps
     const records = accumulatedRecords;
 
+    // Sentiment Analysis in Batches
+    const POSTS_BATCH_SIZE = 100; // Sentiment analysis is heavy
+    const postChunks: App.RecordExt[][] = [];
+    for (let i = 0; i < records.posts.length; i += POSTS_BATCH_SIZE) {
+      postChunks.push(records.posts.slice(i, i + POSTS_BATCH_SIZE));
+    }
+
+    const analyzedChunks: { wordFreqMap: App.WordFreq[], sentimentHeatmap: number[], sentimentHistory: Array<{ date: string, score: number }> }[] = [];
+    for (let i = 0; i < postChunks.length; i++) {
+      const chunkResult = await step.run(`analyze-posts-chunk-${i}`, async () => {
+        const { analyzePosts } = await import("../core/analyzePosts");
+        console.log(`[INFO][INNGEST] analyze-posts-chunk-${i}`);
+        return await analyzePosts(postChunks[i]);
+      });
+      analyzedChunks.push(chunkResult);
+    }
+
+    // Merge results
+    const mergedWordFreqMap: Record<string, App.WordFreq> = {};
+    let mergedSentimentHistory: Array<{ date: string, score: number }> = [];
+
+    for (const result of analyzedChunks) {
+      // Merge WordFreq
+      result.wordFreqMap.forEach((item: App.WordFreq) => {
+        if (!mergedWordFreqMap[item.noun]) {
+          mergedWordFreqMap[item.noun] = { ...item };
+        } else {
+          mergedWordFreqMap[item.noun].count += item.count;
+          mergedWordFreqMap[item.noun].sentimentScoreSum += item.sentimentScoreSum;
+        }
+      });
+
+      // Merge History
+      mergedSentimentHistory = mergedSentimentHistory.concat(result.sentimentHistory);
+    }
+
+    // Sort merged results
+    const finalWordFreqMap = Object.values(mergedWordFreqMap).sort((a, b) => b.count - a.count);
+    mergedSentimentHistory.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    // Recalculate Heatmap from History
+    const finalSentimentHeatmap = new Array(24).fill(0);
+    const sentimentAccumulator: Record<number, { sum: number; count: number }> = {};
+
+    mergedSentimentHistory.forEach(item => {
+      const date = new Date(item.date);
+      const jstHour = new Date(date.getTime() + 9 * 60 * 60 * 1000).getUTCHours();
+      if (!sentimentAccumulator[jstHour]) {
+        sentimentAccumulator[jstHour] = { sum: 0, count: 0 };
+      }
+      sentimentAccumulator[jstHour].sum += item.score;
+      sentimentAccumulator[jstHour].count++;
+    });
+
+    Object.entries(sentimentAccumulator).forEach(([hour, { sum, count }]) => {
+      finalSentimentHeatmap[Number(hour)] = count > 0 ? sum / count : 0;
+    });
+
+    const analyzedPostsData = {
+      wordFreqMap: finalWordFreqMap,
+      sentimentHeatmap: finalSentimentHeatmap,
+      sentimentHistory: mergedSentimentHistory
+    };
+
     const newResultAnalyze = await step.run("analyze-records", async () => {
       const { analyzeRecords } = await import("../core/analyzeRecords");
-      return await analyzeRecords(did, records);
+      return await analyzeRecords(did, records, analyzedPostsData);
     }) as App.ResultAnalyze;
+    console.log("[INFO][INNGEST] analyze-records");
 
     await step.run("upsert-records-intermediate", async () => {
       await upsertRecords(handle, newResultAnalyze, null);
     });
+    console.log("[INFO][INNGEST] upsert-records-intermediate");
 
     const percentiles = await step.run("get-percentiles", async () => {
       // パーセンタイルを求めるためには2回DB操作が必要
       return await getPercentilesForProperties(handle);
     });
+    console.log("[INFO][INNGEST] get-percentiles");
 
     await step.run("upsert-records-final", async () => {
       await upsertRecords(handle, newResultAnalyze, percentiles);
     });
+    console.log("[INFO][INNGEST] upsert-records-final");
   }
 )
 

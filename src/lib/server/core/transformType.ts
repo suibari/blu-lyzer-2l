@@ -1,4 +1,6 @@
 export const transformDbToApp = (handle: string, data: App.ResultAnalyzeDB, updated_at: string): App.ResultAnalyze => {
+  const historyLen = data.sentimentHistory ? data.sentimentHistory.length : 0;
+  console.log(`[INFO][transformDbToApp] Loaded sentimentHistory for ${handle}: ${historyLen} items`);
   return {
     activity: {
       all: {
@@ -11,7 +13,9 @@ export const transformDbToApp = (handle: string, data: App.ResultAnalyzeDB, upda
         averageLength: data.averageTextLength || null,
         wordFreqMap: data.wordFreqMap || null,
         actionHeatmap: data.postHistgram || [],
-        sentimentHeatmap: data.sentimentHeatmap || [],
+        sentimentHeatmap: data.sentimentHeatmap || new Array(24).fill(0),
+        sentimentHistory: data.sentimentHistory || [],
+        sentimentCalendar: null,
         lastAt: data.lastPostTime || null,
         reply: {
           averageInterval: data.averageReplyInterval || undefined,
@@ -37,6 +41,11 @@ export const transformDbToApp = (handle: string, data: App.ResultAnalyzeDB, upda
 }
 
 export const transformAppToDb = (resultAnalyze: App.ResultAnalyze): App.ResultAnalyzeDB => {
+  if (resultAnalyze.activity.post.sentimentHistory && resultAnalyze.activity.post.sentimentHistory.length > 0) {
+    console.log(`[INFO][transformAppToDb] Saving sentimentHistory: ${resultAnalyze.activity.post.sentimentHistory.length} items`);
+  } else {
+    console.log(`[INFO][transformAppToDb] Saving sentimentHistory: EMPTY or NULL`);
+  }
   return {
     // all
     averageInterval: resultAnalyze.activity.all.averageInterval,
@@ -48,6 +57,7 @@ export const transformAppToDb = (resultAnalyze: App.ResultAnalyze): App.ResultAn
     wordFreqMap: resultAnalyze.activity.post.wordFreqMap,
     postHistgram: resultAnalyze.activity.post.actionHeatmap,
     sentimentHeatmap: resultAnalyze.activity.post.sentimentHeatmap,
+    sentimentHistory: resultAnalyze.activity.post.sentimentHistory,
     lastPostTime: resultAnalyze.activity.post.lastAt,
     // reply
     averageReplyInterval: resultAnalyze.activity.post.reply.averageInterval || null,

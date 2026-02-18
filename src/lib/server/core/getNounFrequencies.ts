@@ -2,17 +2,19 @@ import { EXCLUDE_WORDS, MIN_WORD_COUNT, MIN_WORD_LENGTH } from './config/exclude
 import { fetchSentimentAnalysis } from './fetchAnalyzer';
 
 export async function getNounFrequencies(posts: App.RecordExt[]): Promise<{
-  wordFreqMap: App.wordFreq[];
+  wordFreqMap: App.WordFreq[];
   sentimentHeatmap: number[];
+  sentimentHistory: Array<{ date: string, score: number }>;
 }> {
-  const wordFreqMap: App.wordFreq[] = [];
+  const wordFreqMap: App.WordFreq[] = [];
   const sentimentHeatmap = new Array(24).fill(0);
+  const sentimentHistory: Array<{ date: string, score: number }> = [];
 
   const textsArray = posts.map(post => post.value.text || "");
 
   if (!textsArray.length) {
     console.log('[INFO] No valid text to analyze');
-    return { wordFreqMap, sentimentHeatmap };
+    return { wordFreqMap, sentimentHeatmap, sentimentHistory };
   }
 
   try {
@@ -32,6 +34,11 @@ export async function getNounFrequencies(posts: App.RecordExt[]): Promise<{
       sentimentAccumulator[jstHour] = sentimentAccumulator[jstHour] || { sum: 0, count: 0 };
       sentimentAccumulator[jstHour].sum += average_sentiments[index];
       sentimentAccumulator[jstHour].count += 1;
+
+      sentimentHistory.push({
+        date: post.value.createdAt,
+        score: average_sentiments[index]
+      });
     });
 
     Object.entries(sentimentAccumulator).forEach(([hour, { sum, count }]) => {
@@ -43,7 +50,8 @@ export async function getNounFrequencies(posts: App.RecordExt[]): Promise<{
 
   } catch (err) {
     console.warn('[WARN] Error in word analyze:', err);
+    throw err;
   }
 
-  return { wordFreqMap: wordFreqMap.slice(0, 100), sentimentHeatmap };
+  return { wordFreqMap: wordFreqMap, sentimentHeatmap, sentimentHistory };
 }

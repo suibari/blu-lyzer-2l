@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // pn_en.dicファイルの読み込み
-const dictionaryPath = (PUBLIC_NODE_ENV === "development") ? 'src/lib/server/core/dict/pn_en.dic' : resolve(__dirname, '../../../../src/lib/server/core/dict/pn_en.dic') ; // for Vercel
+const dictionaryPath = (PUBLIC_NODE_ENV === "development") ? 'src/lib/server/core/dict/pn_en.dic' : resolve(__dirname, '../../../../src/lib/server/core/dict/pn_en.dic'); // for Vercel
 const sentimentDictionary: Record<string, number> = Object.create(null);
 readFileSync(dictionaryPath, 'utf-8')
   .split('\n')
@@ -22,13 +22,15 @@ readFileSync(dictionaryPath, 'utf-8')
 export async function getWordFrequencyEn(posts: App.RecordExt[]): Promise<{
   wordFreqMap: App.WordFreq[];
   sentimentHeatmap: number[];
+  sentimentHistory: Array<{ date: string, score: number }>;
 }> {
   const wordFreqMap: App.WordFreq[] = [];
   const sentimentHeatmap = new Array(24).fill(0);
+  const sentimentHistory: Array<{ date: string, score: number }> = [];
 
   if (!posts.length) {
     console.log('[INFO] No posts to analyze');
-    return { wordFreqMap, sentimentHeatmap };
+    return { wordFreqMap, sentimentHeatmap, sentimentHistory };
   }
 
   const wordCountMap: Record<string, { count: number; sentimentScoreSum: number }> = {};
@@ -63,8 +65,14 @@ export async function getWordFrequencyEn(posts: App.RecordExt[]): Promise<{
     const jstHour = new Date(createdAt.getTime() + 9 * 60 * 60 * 1000).getUTCHours(); // JSTに変換
 
     sentimentAccumulator[jstHour] = sentimentAccumulator[jstHour] || { sum: 0, count: 0 };
-    sentimentAccumulator[jstHour].sum += postSentimentCount > 0 ? postSentimentSum / postSentimentCount : 0;
+    const postScore = postSentimentCount > 0 ? postSentimentSum / postSentimentCount : 0;
+    sentimentAccumulator[jstHour].sum += postScore;
     sentimentAccumulator[jstHour].count += 1;
+
+    sentimentHistory.push({
+      date: post.value.createdAt,
+      score: postScore
+    });
   });
 
   // ヒートマップを計算
@@ -81,5 +89,5 @@ export async function getWordFrequencyEn(posts: App.RecordExt[]): Promise<{
 
   wordFreqMap.sort((a, b) => b.count - a.count);
 
-  return { wordFreqMap: wordFreqMap.slice(0, 100), sentimentHeatmap };
+  return { wordFreqMap: wordFreqMap, sentimentHeatmap, sentimentHistory };
 }

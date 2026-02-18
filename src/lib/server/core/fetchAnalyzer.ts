@@ -7,11 +7,12 @@ export async function fetchSentimentAnalysis(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ texts }),
+    signal: AbortSignal.timeout(300000) // 5 minutes timeout
   });
 
   if (!response.ok) {
     throw new Error('Failed to fetch sentiment from NEGPOSI_API');
   }
-  
+
   return response.json();
 }

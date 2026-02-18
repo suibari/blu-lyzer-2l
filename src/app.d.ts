@@ -11,14 +11,14 @@ declare global {
 		export interface RecordExt extends Record {
 			value: RecordValue;
 		}
-		
+
 		interface RecordValue {
-      langs?: string[];
+			langs?: string[];
 			$type: string,
 			createdAt: string,
 			text?: string,
 			reply?: { parent: { uri: string } },
-			subject?: { 
+			subject?: {
 				cid: string,
 				uri: string,
 			},
@@ -28,45 +28,48 @@ declare global {
 		export interface ResultAnalyze {
 			activity: {
 				all: {
-					averageInterval: number|null;
-					actionHeatmap: number[]|null;
-					lastAt: string|null;
+					averageInterval: number | null;
+					actionHeatmap: number[] | null;
+					lastAt: string | null;
 				};
 				post: {
-					averageInterval: number|null;
-					averageLength: number|null;
-					wordFreqMap: wordFreq[]|null;
-					actionHeatmap: number[]|null;
-					sentimentHeatmap: number[]|null;
-					lastAt: string|null;
+					averageInterval: number | null;
+					averageLength: number | null;
+					wordFreqMap: wordFreq[] | null;
+					actionHeatmap: number[] | null;
+					sentimentHeatmap: number[] | null;
+					sentimentHistory: Array<{ date: string, score: number }> | null;
+					// sentimentCalendar is computed view-model
+					sentimentCalendar: Record<string, number> | null;
+					lastAt: string | null;
 					reply: {
-						averageInterval: number|null|undefined;
-						actionHeatmap: number[]|null|undefined;
-						lastAt: string|null|undefined;
+						averageInterval: number | null | undefined;
+						actionHeatmap: number[] | null | undefined;
+						lastAt: string | null | undefined;
 					}
 				};
 				like: {
-					averageInterval: number|null;
-					actionHeatmap: number[]|null;
-					lastAt: string|null;
+					averageInterval: number | null;
+					actionHeatmap: number[] | null;
+					lastAt: string | null;
 				};
 				repost: {
-					averageInterval: number|null;
-					actionHeatmap: number[]|null;
-					lastAt: string|null;
+					averageInterval: number | null;
+					actionHeatmap: number[] | null;
+					lastAt: string | null;
 				};
 			};
-			relationship: RecentFriend[]|null;
+			relationship: RecentFriend[] | null;
 			updatedAt: string;
 			handle?: string;
 		}
-		
+
 		export interface WordFreq {
 			noun: string;
 			count: number;
 			sentimentScoreSum: number;
 		};
-		
+
 		export interface RecentFriend {
 			did: string;
 			handle?: string;
@@ -75,35 +78,36 @@ declare global {
 			score: number;
 			replyCount?: number;
 			likeCount?: number;
-			resultAnalyze?: ResultAnalyze|null;
+			resultAnalyze?: ResultAnalyze | null;
 		};
-		
+
 		export interface ResultAnalyzeDB {
 			// all
-			averageInterval: number|null;
-			activeHistgram: number[]|null;
-			lastActionTime: string|null;
+			averageInterval: number | null;
+			activeHistgram: number[] | null;
+			lastActionTime: string | null;
 			// post
-			averagePostsInterval: number|null;
-			averageTextLength: number|null;
-			wordFreqMap: App.WordFreq[]|null;
-			postHistgram: number[]|null;
-			sentimentHeatmap: number[]|null;
-			lastPostTime: string|null;
+			averagePostsInterval: number | null;
+			averageTextLength: number | null;
+			wordFreqMap: App.WordFreq[] | null;
+			postHistgram: number[] | null;
+			sentimentHeatmap: number[] | null;
+			sentimentHistory: Array<{ date: string, score: number }> | null;
+			lastPostTime: string | null;
 			// reply
-			averageReplyInterval: number|null;
-			replyHistgram: number[]|null;
-			lastReplyTime: string|null;
+			averageReplyInterval: number | null;
+			replyHistgram: number[] | null;
+			lastReplyTime: string | null;
 			// like
-			averageLikeInterval?: number|null;
-			likeHistgram: number[]|null;
-			lastLikeTime: string|null;
+			averageLikeInterval?: number | null;
+			likeHistgram: number[] | null;
+			lastLikeTime: string | null;
 			// repost
-			averageRepostInterval?: number|null;
-			repostHistgram: number[]|null;
-			lastRepostTime?: string|null;
+			averageRepostInterval?: number | null;
+			repostHistgram: number[] | null;
+			lastRepostTime?: string | null;
 			// relationship
-			recentFriends: RecentFriend[]|null;
+			recentFriends: RecentFriend[] | null;
 		}
 
 		export interface Percentiles {

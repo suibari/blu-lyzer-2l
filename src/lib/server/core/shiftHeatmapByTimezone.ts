@@ -1,4 +1,4 @@
-import { toZonedTime } from 'date-fns-tz';  // タイムゾーン変換関数
+import { toZonedTime, format } from 'date-fns-tz';  // タイムゾーン変換関数
 
 export function shiftHeatmapInResultAnalyze(resultAnalyze: App.ResultAnalyze, userTimeZone: string): App.ResultAnalyze {
   // 元のオブジェクトを壊さないために新しいオブジェクトを作成
@@ -29,6 +29,10 @@ export function shiftHeatmapInResultAnalyze(resultAnalyze: App.ResultAnalyze, us
     ? shiftHeatmap(resultAnalyze.activity.post.reply.actionHeatmap, userTimeZone)
     : null;
 
+  shiftedResultAnalyze.activity.post.sentimentCalendar = resultAnalyze.activity.post.sentimentHistory
+    ? generateSentimentCalendar(resultAnalyze.activity.post.sentimentHistory, userTimeZone)
+    : null;
+
   return shiftedResultAnalyze;
 }
 
@@ -49,10 +53,32 @@ function shiftHeatmap(heatmap: number[], userTimeZone: string): number[] {
 
   // heatmap配列をシフトする（シフトがないように修正）
   const shiftedHeatmap = [
-    ...heatmap.slice(userOffset), 
+    ...heatmap.slice(userOffset),
     ...heatmap.slice(0, userOffset)
   ];
 
   // ヒートマップのデータをユーザーのオフセットに従ってシフト
   return shiftedHeatmap;
+}
+
+function generateSentimentCalendar(history: Array<{ date: string, score: number }>, userTimeZone: string): Record<string, number> {
+  const calendar: Record<string, { sum: number, count: number }> = {};
+
+  history.forEach(item => {
+    // ユーザーのタイムゾーンでの日付文字列を取得 (YYYY-MM-DD)
+    const dateStr = format(new Date(item.date), 'yyyy-MM-dd', { timeZone: userTimeZone });
+
+    if (!calendar[dateStr]) {
+      calendar[dateStr] = { sum: 0, count: 0 };
+    }
+    calendar[dateStr].sum += item.score;
+    calendar[dateStr].count += 1;
+  });
+
+  const result: Record<string, number> = {};
+  Object.keys(calendar).forEach(date => {
+    result[date] = calendar[date].sum / calendar[date].count;
+  });
+
+  return result;
 }
