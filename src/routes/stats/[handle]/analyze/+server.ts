@@ -119,6 +119,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         name: "analyze/new-user",
         data: {
           handle,
+          did,
           newResultAnalyze: shiftedResultAnalyze
         }
       });
