@@ -9,7 +9,7 @@ interface MetaData {
   ogUrl: string;
 }
 
-export const load: PageServerLoad = async ({ params, fetch, url }) => {
+export const load: PageServerLoad = async ({ params, fetch, url, locals }) => {
   const handle = params.handle;
 
   // サーバからデータを取得
@@ -30,6 +30,7 @@ export const load: PageServerLoad = async ({ params, fetch, url }) => {
       ogTitle,
       ogImage,
       ogUrl
-    } as MetaData
+    } as MetaData,
+    did: locals.did
   };
 };

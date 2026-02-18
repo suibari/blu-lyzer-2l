@@ -225,17 +225,19 @@
           recentFriends={resultAnalyze.relationship}
           wordFreqMap={undefined}
         />
-        <LineGraphMuitiData
-          datasets={resultAnalyze.relationship
-            .slice(0, 10)
-            .map((friend, index) => ({
-              data:
-                friend.resultAnalyze?.activity.all.actionHeatmap || Array(24),
-              label: friend.displayName || `No Name`, // 名前がない場合のデフォルト
-            }))
-            .filter((dataset) => dataset.data)}
-          peakActivityHour={getPeakFriendsActivityHour(resultAnalyze)}
-        />
+        {#if profile.did && data.did === profile.did}
+          <LineGraphMuitiData
+            datasets={resultAnalyze.relationship
+              .slice(0, 10)
+              .map((friend, index) => ({
+                data:
+                  friend.resultAnalyze?.activity.all.actionHeatmap || Array(24),
+                label: friend.displayName || `No Name`, // 名前がない場合のデフォルト
+              }))
+              .filter((dataset) => dataset.data)}
+            peakActivityHour={getPeakFriendsActivityHour(resultAnalyze)}
+          />
+        {/if}
       {/if}
     </div>
 
@@ -259,13 +261,15 @@
         ]}
       />
       {#if resultAnalyze.activity.post.actionHeatmap && resultAnalyze.activity.like.actionHeatmap && resultAnalyze.activity.repost.actionHeatmap}
-        <BarGraph
-          postData={resultAnalyze.activity.post.actionHeatmap}
-          replyData={resultAnalyze.activity.post.reply.actionHeatmap ||
-            Array(24)}
-          likeData={resultAnalyze.activity.like.actionHeatmap}
-          repostData={resultAnalyze.activity.repost.actionHeatmap}
-        />
+        {#if profile.did && data.did === profile.did}
+          <BarGraph
+            postData={resultAnalyze.activity.post.actionHeatmap}
+            replyData={resultAnalyze.activity.post.reply.actionHeatmap ||
+              Array(24)}
+            likeData={resultAnalyze.activity.like.actionHeatmap}
+            repostData={resultAnalyze.activity.repost.actionHeatmap}
+          />
+        {/if}
       {/if}
     </div>
 
