@@ -14,6 +14,7 @@ const sessionManager = SessionManager.getInstance();
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
   const { handle } = params;
+  const isBot = isBotUserAgent(request.headers.get('user-agent') ?? '');
   let configInvisible: App.ConfigInvisible = { allHeatmap: false, friendsHeatmap: false };
 
   if (!handle) {
@@ -73,6 +74,8 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       // バックグラウンド処理
       if (isUpdatedWithinAnHour(data.updated_at) && PUBLIC_NODE_ENV !== "development") {
         console.log(`[INFO] skip background process: ${handle}`);
+      } else if (isBot) {
+        console.log(`[INFO] skip background process for bot: ${handle}`);
       } else {
         await inngest.send({
           name: "analyze/existing-user",
@@ -115,14 +118,18 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       await setResultAnalyzeFriends(shiftedResultAnalyze, timeZone);
 
       // バックグラウンド処理
-      await inngest.send({
-        name: "analyze/new-user",
-        data: {
-          handle,
-          did,
-          newResultAnalyze: shiftedResultAnalyze
-        }
-      });
+      if (!isBot) {
+        await inngest.send({
+          name: "analyze/new-user",
+          data: {
+            handle,
+            did,
+            newResultAnalyze: shiftedResultAnalyze
+          }
+        });
+      } else {
+        console.log(`[INFO] skip background process for bot (new user): ${handle}`);
+      }
 
       return new Response(JSON.stringify({
         resultAnalyze: shiftedResultAnalyze,
@@ -186,6 +193,17 @@ function filterResultAnalyze(resultAnalyze: App.ResultAnalyze, configInvisible: 
  * @param resultAnalyze 
  * @param timeZone 
  */
+const BOT_UA_PATTERNS = [
+  /googlebot/i, /bingbot/i, /slurp/i, /duckduckbot/i,
+  /baiduspider/i, /yandexbot/i, /applebot/i,
+  /twitterbot/i, /discordbot/i, /telegrambot/i,
+  /semrushbot/i, /ahrefsbot/i, /mj12bot/i,
+];
+
+function isBotUserAgent(ua: string): boolean {
+  return BOT_UA_PATTERNS.some(p => p.test(ua));
+}
+
 async function setResultAnalyzeFriends(resultAnalyze: App.ResultAnalyze, timeZone: string) {
   const handleFriends = (resultAnalyze.relationship ?? [])
     .map(friend => friend.handle)

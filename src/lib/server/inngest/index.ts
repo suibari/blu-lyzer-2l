@@ -128,7 +128,18 @@ const runFullAnalysis = async (step: any, handle: string, did: string) => {
 };
 
 export const doAnalyzeAndUpsertExistingUser = inngest.createFunction(
-  { id: "analyze-upsert" },
+  {
+    id: "analyze-upsert",
+    concurrency: [
+      { limit: 1, key: "event.data.handle" },
+      { limit: 5, scope: "fn" },
+    ],
+    rateLimit: {
+      limit: 1,
+      period: "1h",
+      key: "event.data.handle",
+    },
+  },
   { event: "analyze/existing-user" },
   async ({ event, step }) => {
     const handle = event.data.handle;
@@ -138,7 +149,13 @@ export const doAnalyzeAndUpsertExistingUser = inngest.createFunction(
 )
 
 export const doAnalyzeAndUpsertNewUser = inngest.createFunction(
-  { id: "analyze_upsert" },
+  {
+    id: "analyze_upsert",
+    concurrency: [
+      { limit: 1, key: "event.data.handle" },
+      { limit: 5, scope: "fn" },
+    ],
+  },
   { event: "analyze/new-user" },
   async ({ event, step }) => {
     const handle = event.data.handle
